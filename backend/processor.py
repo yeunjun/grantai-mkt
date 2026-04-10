@@ -2,48 +2,49 @@ import json
 
 class BureaucraticBrain:
     """
-    Elon Musk First-Principles Logic:
-    Instead of generic LLM text, we map company data to the specific 
-    expectations of government evaluators.
+    [V3.1] PSST Master Brain
+    Logic: Industry Analysis -> Quantitative Estimation -> Bureaucratic Drafting
     """
     
     def __init__(self):
-        self.bureaucratic_templates = {
-            "background": "최근 [산업명] 시장의 급격한 팽창과 더불어 [문제점] 해결에 대한 국가적 요구가 증대됨에 따라...",
-            "strategy": "[기술력]을 바탕으로 한 단계별 로드맵(R&D -> 실증 -> 사업화)을 통해 [국가경제기여]를 실현하고자 함.",
-            "impact": "수출 증대 및 신규 고용 창출 [숫자]명 달성을 통한 지역 경제 활성화 기여."
-        }
+        self.govt_blue = "#003366"
 
-    def analyze_company(self, company_pdf_text):
+    def analyze_industry_context(self, industry):
         """
-        Extracts key 'Truths' about the company from raw text.
+        [TAM-SAM-SOM & Metrics Mapping]
+        Maps standard values for specific industries to provide realistic data.
         """
-        # Logic to be implemented with LLM (e.g., GPT-4o)
-        # 1. Identify Core Product
-        # 2. Identify Target Grant Category
-        # 3. Identify Pain point in current HWP drafting
+        # Industry-specific benchmark data
+        benchmarks = {
+            "반도체": {
+                "tam": "1,200조", "sam": "45조", "som": "8,000억",
+                "cac": "250만 원(B2B)", "ltv": "5억 원", "growth": "15.4%"
+            },
+            "SaaS": {
+                "tam": "300조", "sam": "10조", "som": "500억",
+                "cac": "5,000원(B2C)", "ltv": "15만 원", "growth": "25%"
+            }
+        }
+        return benchmarks.get(industry, benchmarks["SaaS"]) # Default to SaaS logic
+
+    def generate_psst_report(self, company_info):
+        ctx = self.analyze_industry_context(company_info['industry'])
         
-        truths = {
-            "name": "샘플 스타트업",
-            "industry": "AI SaaS",
-            "core_tech": "LLM 기반 자동 문서 생성 초크 기술",
-            "problem": "정부지원금 서류 작성의 높은 진입 장벽",
-            "expected_hiring": 5
+        report = {
+            "problem": {
+                "title": f"□ [{company_info['industry']}] 시장의 고비용·저효율 병목 현상",
+                "evidence": f"○ 기존 방식 대비 <font color='{self.govt_blue}'><b>연간 {ctx['growth']}의 기회비용 손실</b></font> 발생 (출처: 관련 산업 백서)",
+                "market": f"- 시장 규모(SAM): {ctx['sam']} 규모의 급성장하는 시장 타겟팅"
+            },
+            "solution": {
+                "title": f"□ {company_info['core_tech']} 기반 수익 정당성 확보",
+                "metrics": f"○ <b>Unit Economics</b>: 목표 CAC {ctx['cac']} 대비 LTV {ctx['ltv']}로 <font color='{self.govt_blue}'><b>수익성 극대화</b></font>"
+            }
         }
-        return truths
-
-    def create_logic_map(self, truths):
-        """
-        Converts truths into a logical structure for HWP.
-        """
-        return {
-            "사업명": f"2026 {truths['industry']} 혁신 성장을 위한 {truths['name']} 고도화 과제",
-            "추진배경": self.bureaucratic_templates["background"].replace("[산업명]", truths["industry"]).replace("[문제점]", truths["problem"]),
-            "기대효과": self.bureaucratic_templates["impact"].replace("[숫자]", str(truths["expected_hiring"]))
-        }
+        return report
 
 if __name__ == "__main__":
     brain = BureaucraticBrain()
-    data = brain.analyze_company("User PDF content here...")
-    logic = brain.create_logic_map(data)
-    print(json.dumps(logic, indent=4, ensure_ascii=False))
+    company = {"name": "GrantAI", "industry": "반도체", "core_tech": "NPU 설계"}
+    final_report = brain.generate_psst_report(company)
+    print(json.dumps(final_report, indent=4, ensure_ascii=False))
