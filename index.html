@@ -664,11 +664,17 @@
         <div id="gen-spinner" style="width:56px; height:56px; border:3px solid rgba(99,102,241,.2); border-top-color:#6366f1; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 24px;"></div>
         <div style="font-size:1.2rem; font-weight:800; margin-bottom:8px;" id="gen-loading-title">AI 분석 중...</div>
         <div style="color:#64748b; font-size:.875rem;" id="gen-loading-sub">회사 정보를 분석하고 있습니다</div>
-        <div style="margin-top:28px; display:flex; flex-direction:column; gap:8px; max-width:320px; margin-left:auto; margin-right:auto;" id="gen-steps-list">
-          <div class="gen-step-row" id="gsr-1">⏳ 공고 평가기준 추출 중...</div>
-          <div class="gen-step-row" id="gsr-2" style="color:#475569">○ PSST 초안 작성</div>
-          <div class="gen-step-row" id="gsr-3" style="color:#475569">○ 심사관 시뮬레이터 검토</div>
-          <div class="gen-step-row" id="gsr-4" style="color:#475569">○ 최종 점수 예측</div>
+        <div style="margin-top:28px; display:flex; flex-direction:column; gap:8px; max-width:340px; margin-left:auto; margin-right:auto;" id="gen-steps-list">
+          <div class="gen-step-row" id="gsr-criteria">⏳ 공고 평가기준 분석 중...</div>
+          <div class="gen-step-row pending" id="gsr-draft">○ PSST 초안 작성</div>
+          <div class="gen-step-row pending" id="gsr-review">○ 심사관 시뮬레이터 검토</div>
+          <div class="gen-step-row pending" id="gsr-final">○ 최종 점수 예측</div>
+        </div>
+        <!-- 실시간 점수 -->
+        <div id="gen-live-score" style="display:none; margin-top:24px; background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.25); border-radius:16px; padding:16px 20px;">
+          <div style="font-size:.78rem; color:#94a3b8; margin-bottom:6px;">실시간 점수</div>
+          <div id="gen-score-val" style="font-size:2rem; font-weight:900; background:linear-gradient(135deg,#6366f1,#a855f7); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">--점</div>
+          <div id="gen-score-msg" style="font-size:.8rem; color:#64748b; margin-top:4px;"></div>
         </div>
       </div>
 
@@ -703,6 +709,9 @@
               <div style="font-size:2rem; margin-bottom:8px;">🔒</div>
               <div style="font-weight:800; font-size:1rem; margin-bottom:6px;">4~15페이지 + PDF 다운로드</div>
               <div style="color:#94a3b8; font-size:.82rem; margin-bottom:18px;">강점 분석 · 배점 최적화 전략 · 고용창출·해외진출 섹션 · 성능지표 표</div>
+              <button id="btn-download-pdf" onclick="downloadPdf()" style="display:none; padding:14px 32px; border-radius:12px; border:none; cursor:pointer; font-size:.95rem; font-weight:800; background:linear-gradient(135deg,#059669,#10b981); color:#fff; margin-bottom:10px; width:100%;">
+                📥 전체 PDF 다운로드
+              </button>
               <button onclick="closeGenModal(); openApplyModal();" style="padding:14px 32px; border-radius:12px; border:none; cursor:pointer; font-size:.95rem; font-weight:800; background:linear-gradient(135deg,#6366f1,#a855f7); color:#fff;">
                 전체 PDF 받기 → 무료 신청
               </button>
@@ -724,7 +733,8 @@
   </div>
   <style>
     @keyframes spin { to { transform: rotate(360deg); } }
-    .gen-step-row { font-size:.85rem; color:#a78bfa; font-weight:600; padding:6px 0; }
+    .gen-step-row { font-size:.85rem; color:#a78bfa; font-weight:600; padding:6px 0; transition: color .3s; }
+    .gen-step-row.pending { color:#475569; }
   </style>
 
   <script type="module" src="index.js"></script>
@@ -847,39 +857,93 @@
       }
     }
 
-    // 로딩 스텝 애니메이션
-    function animateLoadingSteps() {
-      const steps = [
-        { id:'gsr-1', text:'✅ 공고 평가기준 추출 완료', delay:4000 },
-        { id:'gsr-2', text:'✅ PSST 초안 작성 중...', delay:12000 },
-        { id:'gsr-3', text:'✅ 심사관 시뮬레이터 검토 중...', delay:25000 },
-        { id:'gsr-4', text:'✅ 최종 점수 예측 중...', delay:38000 },
-      ];
-      const titles = [
-        { title:'공고 평가기준 분석 중...', sub:'배점표를 AI가 분석합니다', delay:0 },
-        { title:'PSST 초안 작성 중...', sub:'15페이지 구조를 잡고 있습니다', delay:4000 },
-        { title:'심사관 시뮬레이터 가동...', sub:'약점을 찾아 3라운드 보강 중', delay:12000 },
-        { title:'점수 예측 및 마무리...', sub:'거의 다 됐습니다!', delay:38000 },
-      ];
-      // 스텝 초기화
-      for(let i=1;i<=4;i++) document.getElementById('gsr-'+i).style.color='#475569';
-      document.getElementById('gsr-1').style.color='#a78bfa';
-      document.getElementById('gsr-1').textContent='⏳ 공고 평가기준 추출 중...';
-
-      steps.forEach(({id,text,delay}) => setTimeout(() => {
+    // ── 진행 스텝 헬퍼 ──
+    const STEP_IDS = { criteria:'gsr-criteria', draft:'gsr-draft', review:'gsr-review', refine:'gsr-review', final:'gsr-final', done_draft:'gsr-final' };
+    function setStep(stepKey, done=false, text='') {
+      const id = STEP_IDS[stepKey];
+      if (!id) return;
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (done) { el.textContent = '✅ ' + (text || el.textContent.replace(/^[⏳○✅]\s*/,'')); el.style.color = '#4ade80'; el.classList.remove('pending'); }
+      else       { el.textContent = '⏳ ' + (text || el.textContent.replace(/^[⏳○✅]\s*/,'')); el.style.color = '#a78bfa'; el.classList.remove('pending'); }
+    }
+    function resetSteps() {
+      ['gsr-criteria','gsr-draft','gsr-review','gsr-final'].forEach(id => {
         const el = document.getElementById(id);
-        if(el) { el.textContent=text; el.style.color='#4ade80'; }
-        // 다음 스텝 활성화
-        const next = 'gsr-'+(parseInt(id.slice(-1))+1);
-        const nextEl = document.getElementById(next);
-        if(nextEl && nextEl.textContent.startsWith('○'))
-          setTimeout(()=>{ nextEl.style.color='#a78bfa'; nextEl.textContent='⏳'+nextEl.textContent.slice(1); }, 500);
-      }, delay));
+        if(el) { el.style.color='#475569'; el.classList.add('pending'); }
+      });
+      document.getElementById('gen-live-score').style.display = 'none';
+    }
 
-      titles.forEach(({title,sub,delay}) => setTimeout(()=>{
-        document.getElementById('gen-loading-title').textContent=title;
-        document.getElementById('gen-loading-sub').textContent=sub;
-      }, delay));
+    // ── 페이지 분할 (문단/섹션 경계 기준) ──
+    function splitPages(txt) {
+      const paras = txt.split(/\n{2,}/);
+      const pages = [];
+      let cur = '';
+      for (const p of paras) {
+        const candidate = cur ? cur + '\n\n' + p : p;
+        if (candidate.length > 1400 && cur) {
+          pages.push(cur.trim());
+          cur = p;
+        } else {
+          cur = candidate;
+        }
+      }
+      if (cur.trim()) pages.push(cur.trim());
+      return pages.length ? pages : [txt];
+    }
+
+    // ── PDF 다운로드 ──
+    let _pdfB64 = null;
+    let _pdfFilename = '사업계획서.pdf';
+    function downloadPdf() {
+      if (!_pdfB64) return;
+      const bin = atob(_pdfB64);
+      const arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      const blob = new Blob([arr], { type: 'application/pdf' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = _pdfFilename;
+      a.click();
+    }
+
+    // ── 결과 렌더링 ──
+    function renderResult(result) {
+      const text = result.proposal_text || '';
+      const PAGE_STYLE = `background:#fff;color:#1a1a1a;border-radius:8px;padding:32px 36px;font-size:.82rem;line-height:1.85;white-space:pre-wrap;font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;min-height:280px;border:1px solid rgba(255,255,255,.1);position:relative;`;
+      const pages = splitPages(text);
+      const visiblePages = pages.slice(0, 3);
+      const blurredPages = pages.slice(3, 12);
+
+      const visibleContainer = document.getElementById('result-pages-visible');
+      visibleContainer.innerHTML = '';
+      visiblePages.forEach((pt, idx) => {
+        visibleContainer.innerHTML += `<div style="${PAGE_STYLE}"><div style="position:absolute;top:10px;right:14px;font-size:.7rem;color:#94a3b8;">📄 ${idx+1}페이지</div>${pt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}</div>`;
+      });
+
+      const blurContainer = document.getElementById('result-pages-blurred');
+      blurContainer.innerHTML = '';
+      const dummy = '█████ ████████ ████ ██████████\n██████ ████ ███████████ ████\n████████ ██████ ████ █████████████\n';
+      for (let p = 0; p < Math.max(blurredPages.length, 6); p++) {
+        const pt = blurredPages[p] || dummy.repeat(10);
+        blurContainer.innerHTML += `<div style="${PAGE_STYLE}"><div style="position:absolute;top:10px;right:14px;font-size:.7rem;color:#94a3b8;">📄 ${p+4}페이지</div>${pt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}</div>`;
+      }
+
+      const score = result.estimated_score || 76;
+      const grade = result.grade || 'B+';
+      const prob  = Math.round((result.score_prediction || 0.72) * 100);
+      document.getElementById('result-score-badge').textContent = grade + ' · ' + score + '점';
+      document.getElementById('result-prob-badge').textContent  = '합격률 ' + prob + '%';
+
+      // PDF 다운로드 버튼
+      if (result.pdf_b64) {
+        _pdfB64 = result.pdf_b64;
+        _pdfFilename = (result.company_name || '사업계획서') + '_GrantAI.pdf';
+        document.getElementById('btn-download-pdf').style.display = 'block';
+      }
+
+      showGenStep('result');
     }
 
     async function startGenerate() {
@@ -887,7 +951,10 @@
       if (!tech) { alert('핵심 기술 / 제품 설명을 입력해주세요.'); return; }
 
       showGenStep('loading');
-      animateLoadingSteps();
+      resetSteps();
+      setStep('criteria', false, '공고 평가기준 분석 중...');
+      _pdfB64 = null;
+      document.getElementById('btn-download-pdf').style.display = 'none';
 
       let companyInfo = {
         company_name: document.getElementById('gen-company').value || '테스트기업',
@@ -901,6 +968,8 @@
       try {
         // 파일 업로드가 있으면 먼저 분석
         if (uploadedFileData) {
+          document.getElementById('gen-loading-title').textContent = '파일 분석 중...';
+          document.getElementById('gen-loading-sub').textContent = '업로드한 문서에서 정보를 추출합니다';
           const fd = new FormData();
           fd.append('file', uploadedFileData);
           const upResp = await fetch(API_BASE + '/upload', { method:'POST', body:fd });
@@ -910,79 +979,61 @@
           }
         }
 
-        // 계획서 생성 (run_refinement false → 빠른 초안)
-        const genResp = await fetch(API_BASE + '/generate', {
+        // SSE 스트리밍으로 계획서 생성
+        const resp = await fetch(API_BASE + '/generate-stream', {
           method: 'POST',
-          headers: { 'Content-Type':'application/json' },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             customer_id: 0,
             announcement_id: '',
             company_info: companyInfo,
-            run_refinement: false,
-          })
+            run_refinement: true,
+          }),
         });
 
-        if (!genResp.ok) throw new Error('생성 실패 ('+genResp.status+')');
-        const result = await genResp.json();
+        if (!resp.ok) throw new Error('서버 오류 (' + resp.status + ')');
 
-        // 결과 표시 — PDF 페이지 형태로 렌더링
-        const text = result.proposal_text || '';
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
 
-        // 텍스트를 ~800자 단위로 페이지 분할
-        function splitPages(txt, charsPerPage) {
-          const pages = [];
-          let i = 0;
-          while (i < txt.length) {
-            // 문단 경계 찾기
-            let end = i + charsPerPage;
-            if (end < txt.length) {
-              const nl = txt.lastIndexOf('\n', end);
-              if (nl > i + charsPerPage * 0.6) end = nl;
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop(); // 미완성 라인은 버퍼에 유지
+
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            let event;
+            try { event = JSON.parse(line.slice(6)); } catch { continue; }
+
+            if (event.type === 'progress') {
+              document.getElementById('gen-loading-title').textContent = event.message || '';
+              // 스텝 상태 업데이트
+              if (event.step === 'criteria') { setStep('criteria', false, event.message); }
+              else if (event.step === 'draft') { setStep('criteria', true); setStep('draft', false, event.message); }
+              else if (event.step === 'review') { setStep('draft', true); setStep('review', false, event.message); document.getElementById('gen-loading-sub').textContent = `심사관 시뮬레이터 ${event.round}라운드 가동`; }
+              else if (event.step === 'refine') { document.getElementById('gen-loading-sub').textContent = event.message; }
+              else if (event.step === 'final') { setStep('review', true); setStep('final', false, event.message); }
             }
-            pages.push(txt.slice(i, Math.min(end, txt.length)));
-            i = end;
+            else if (event.type === 'score_update') {
+              const liveScore = document.getElementById('gen-live-score');
+              liveScore.style.display = 'block';
+              document.getElementById('gen-score-val').textContent = event.score + '점';
+              document.getElementById('gen-score-msg').textContent = `라운드 ${event.round} · 합격률 ${Math.round(event.pass_probability * 100)}%`;
+            }
+            else if (event.type === 'done') {
+              setStep('final', true);
+              renderResult(event);
+              return;
+            }
+            else if (event.type === 'error') {
+              throw new Error(event.message || '생성 실패');
+            }
           }
-          return pages;
         }
-
-        const PAGE_STYLE = `background:#fff; color:#1a1a1a; border-radius:8px; padding:32px 36px; font-size:.82rem; line-height:1.85; white-space:pre-wrap; font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif; min-height:320px; border:1px solid rgba(255,255,255,.1); position:relative;`;
-
-        const pages = splitPages(text, 900);
-        const visiblePages = pages.slice(0, 3);
-        const blurredPages = pages.slice(3, 12);
-
-        // 실제 페이지들 (1~3)
-        const visibleContainer = document.getElementById('result-pages-visible');
-        visibleContainer.innerHTML = '';
-        visiblePages.forEach((pageText, idx) => {
-          visibleContainer.innerHTML += `
-            <div style="${PAGE_STYLE}">
-              <div style="position:absolute; top:10px; right:14px; font-size:.7rem; color:#94a3b8;">📄 ${idx+1}페이지</div>
-              ${pageText.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
-            </div>`;
-        });
-
-        // 모자이크 페이지들 (4~15) — 더미 텍스트로 채워서 블러 적용
-        const blurContainer = document.getElementById('result-pages-blurred');
-        blurContainer.innerHTML = '';
-        const dummyLines = ['█████ ████████ ████ ██████████', '██████ ████ ███████████ ████', '████████ ██████ ████ █████████████'];
-        for (let p = 0; p < Math.max(blurredPages.length, 6); p++) {
-          const pageContent = blurredPages[p] || dummyLines.join('\n').repeat(8);
-          blurContainer.innerHTML += `
-            <div style="${PAGE_STYLE}">
-              <div style="position:absolute; top:10px; right:14px; font-size:.7rem; color:#94a3b8;">📄 ${p+4}페이지</div>
-              ${pageContent.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
-            </div>`;
-        }
-
-        const score = result.estimated_score || 76;
-        const grade = result.grade || 'B+';
-        const prob  = Math.round((result.score_prediction || 0.72) * 100);
-        document.getElementById('result-score-badge').textContent = grade + ' · ' + score + '점';
-        document.getElementById('result-prob-badge').textContent  = '합격률 ' + prob + '%';
-
-        showGenStep('result');
-
       } catch(err) {
         document.getElementById('gen-error-msg').textContent = err.message || '서버 연결 실패. 잠시 후 다시 시도해주세요.';
         showGenStep('error');
