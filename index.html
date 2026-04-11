@@ -120,8 +120,8 @@
       .calc-amount { font-size:2.2rem; }
     }
   </style>
-  <script type="module" crossorigin src="/grantai-mkt/assets/index-bdcc1141.js"></script>
-  <link rel="stylesheet" href="/grantai-mkt/assets/index-2388e47b.css">
+  <script type="module" crossorigin src="/grantai-mkt/assets/index-74f74c20.js"></script>
+  <link rel="stylesheet" href="/grantai-mkt/assets/index-346f7bc9.css">
 </head>
 <body>
 
@@ -335,6 +335,44 @@
     </div>
   </section>
 
+  <!-- 생성 예시 -->
+  <section style="padding:80px 0;" id="sample">
+    <div class="container">
+      <div class="section-label reveal" style="text-align:center">실제 생성 결과</div>
+      <h2 class="section-title reveal" style="text-align:center">이런 계획서가 나옵니다</h2>
+      <div style="max-width:860px; margin:40px auto 0; background:var(--bg-card); border:1px solid var(--border); border-radius:24px; overflow:hidden;">
+        <div style="background:rgba(99,102,241,.08); border-bottom:1px solid var(--border); padding:18px 28px; display:flex; align-items:center; gap:12px;">
+          <span style="width:12px;height:12px;border-radius:50%;background:#ef4444;display:inline-block;"></span>
+          <span style="width:12px;height:12px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>
+          <span style="width:12px;height:12px;border-radius:50%;background:#22c55e;display:inline-block;"></span>
+          <span style="margin-left:8px;font-size:.82rem;color:var(--text-muted);">GrantAI — 2026 AI·데이터 스타트업 성장 지원사업 계획서 (B+, 76점)</span>
+          <span style="margin-left:auto;font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(34,197,94,.15);color:#4ade80;">합격 가능성 72%</span>
+        </div>
+        <div style="padding:32px 36px; font-size:.9rem; line-height:1.9; color:#e2e8f0; font-family:monospace;">
+          <div style="color:#a78bfa; font-weight:700; margin-bottom:16px;">□ 1. 사업 개요 및 문제 인식</div>
+          <div style="color:#94a3b8; margin-bottom:12px;">○ 시장 규모 (TAM·SAM·SOM)</div>
+          <div style="margin-bottom:8px; padding-left:16px;">- 국내 AI 반도체 설계 시장 <strong style="color:#a78bfa;">₩4.2조</strong> (2026년, IITP 기준)</div>
+          <div style="margin-bottom:8px; padding-left:16px;">- 국내 팹리스 수요 기업 <strong style="color:#a78bfa;">340개사</strong> → SAM ₩8,500억</div>
+          <div style="margin-bottom:20px; padding-left:16px;">- 초기 목표 고객 <strong style="color:#a78bfa;">28개사</strong> → SOM ₩70억</div>
+          <div style="color:#94a3b8; margin-bottom:12px;">○ 핵심 문제점</div>
+          <div style="padding-left:16px; margin-bottom:20px; color:#cbd5e1;">
+            - 기존 EDA 툴(Cadence, Synopsys) 의존도 97%, 라이선스 비용 연간 <strong style="color:#f87171;">5~15억원</strong><br>
+            - 중소 팹리스 국내 AI 최적화 솔루션 부재 → 해외 의존 지속
+          </div>
+          <div style="color:#a78bfa; font-weight:700; margin-bottom:16px;">□ 2. 기술성 및 혁신성 (배점 30점)</div>
+          <div style="padding-left:16px; color:#cbd5e1;">
+            - TRL <strong style="color:#22c55e;">7단계</strong> (시작품 성능 검증 완료, 특허 3건 등록)<br>
+            - 경쟁사 대비 처리속도 <strong style="color:#a78bfa;">3.2배</strong>↑, 전력효율 <strong style="color:#a78bfa;">41%</strong>↑<br>
+            - 핵심 특허 보유: AI 기반 RTL 자동 최적화 알고리즘 (10-2024-XXXXXX)
+          </div>
+          <div style="margin-top:20px; padding:16px; background:rgba(99,102,241,.06); border-radius:12px; border:1px dashed rgba(99,102,241,.2); text-align:center; color:var(--text-muted); font-family:inherit;">
+            🔒 3~15페이지 전체 내용은 <strong style="color:#a78bfa;">프로 플랜</strong>에서 확인하세요
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- 신뢰 지표 -->
   <section class="trust-section reveal" id="trust">
     <div class="container">
@@ -430,6 +468,22 @@
         <div class="faq-item reveal" id="faq-3">
           <button class="faq-question" onclick="toggleFAQ('faq-3')">합격 보장 환불은 어떻게 받나요?<span class="faq-icon">+</span></button>
           <div class="faq-answer"><div class="faq-answer-inner">AI 점수 80점 이상 계획서로 신청했으나 불합격 통보를 받으신 경우, 불합격 통보서를 카카오톡으로 보내주시면 즉시 전액 환불 처리해 드립니다.</div></div>
+        </div>
+        <div class="faq-item reveal" id="faq-4">
+          <button class="faq-question" onclick="toggleFAQ('faq-4')">AI가 쓴 계획서를 그대로 제출해도 되나요?<span class="faq-icon">+</span></button>
+          <div class="faq-answer"><div class="faq-answer-inner">초안 자동 생성 후 대표님이 회사 실상에 맞게 수치와 사례를 보완하시면 됩니다. 전문 컨설턴트 수준의 구조·배점 최적화는 AI가 처리하고, 사실 확인은 대표님이 검토합니다. 평균 2~3시간이면 완성도 높은 계획서가 나옵니다.</div></div>
+        </div>
+        <div class="faq-item reveal" id="faq-5">
+          <button class="faq-question" onclick="toggleFAQ('faq-5')">우리 회사가 어떤 공고에 지원 자격이 되는지 어떻게 아나요?<span class="faq-icon">+</span></button>
+          <div class="faq-answer"><div class="faq-answer-inner">회사 정보(업종·직원수·매출·기술 키워드)를 입력하면 AI가 기업마당 1,317건 공고를 전수 분석해 자격 조건·지원 분야·제외 항목까지 확인하여 맞춤 공고만 추려드립니다. 사람이 일일이 읽는 것 대비 100배 이상 빠릅니다.</div></div>
+        </div>
+        <div class="faq-item reveal" id="faq-6">
+          <button class="faq-question" onclick="toggleFAQ('faq-6')">무료로 먼저 써볼 수 있나요?<span class="faq-icon">+</span></button>
+          <div class="faq-answer"><div class="faq-answer-inner">네, 프리 플랜은 카드 등록 없이 공고 매칭 3건과 지원금 계산기를 무료로 사용하실 수 있습니다. 계획서 생성 1회도 무료 체험 제공됩니다. 마음에 드시면 그때 업그레이드하세요.</div></div>
+        </div>
+        <div class="faq-item reveal" id="faq-7">
+          <button class="faq-question" onclick="toggleFAQ('faq-7')">컨설팅 업체 200만원이랑 뭐가 다른가요?<span class="faq-icon">+</span></button>
+          <div class="faq-answer"><div class="faq-answer-inner">컨설팅 업체는 담당자 1명이 여러 기업을 병행하며 작성합니다. GrantAI는 각 공고의 배점표를 AI가 직접 분석하고, 심사관 시뮬레이터가 3라운드 자기 검토를 수행합니다. 월 99,000원으로 사용 횟수 제한 없이 동일한 품질을 얻을 수 있습니다.</div></div>
         </div>
       </div>
     </div>
