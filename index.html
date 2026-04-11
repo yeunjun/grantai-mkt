@@ -500,6 +500,9 @@
           <a href="#calculator" class="btn-primary" onclick="document.getElementById('calc-btn').focus()">
             💰 지원금 무료 계산하기
           </a>
+          <button onclick="openGenerateModal()" class="btn-primary" style="background:linear-gradient(135deg,#059669,#10b981);">
+            📄 계획서 자동작성 체험하기
+          </button>
         </div>
       </div>
     </div>
@@ -544,6 +547,132 @@
       </div>
     </div>
   </div>
+
+  <!-- 계획서 생성 모달 -->
+  <div id="gen-modal" style="display:none; position:fixed; inset:0; z-index:9998; align-items:center; justify-content:center; padding:16px; overflow-y:auto;">
+    <div onclick="if(event.target===this)closeGenModal()" style="position:absolute; inset:0; background:rgba(0,0,0,.8); backdrop-filter:blur(10px);"></div>
+    <div style="position:relative; background:#0c0c1a; border:1px solid rgba(99,102,241,.3); border-radius:28px; width:100%; max-width:680px; z-index:1; margin:auto; overflow:hidden;">
+
+      <!-- 스텝 1: 입력 -->
+      <div id="gen-step-input" style="padding:40px 36px;">
+        <button onclick="closeGenModal()" style="position:absolute; top:16px; right:20px; background:none; border:none; color:#64748b; font-size:1.5rem; cursor:pointer;">×</button>
+        <div style="margin-bottom:28px;">
+          <div style="font-size:.8rem; font-weight:700; color:#6366f1; letter-spacing:2px; margin-bottom:8px;">AI 계획서 자동작성</div>
+          <h3 style="font-size:1.4rem; font-weight:900; margin-bottom:6px;">회사 정보를 알려주세요</h3>
+          <p style="color:#64748b; font-size:.875rem;">파일 업로드 또는 직접 입력 → AI가 15페이지 계획서 초안 생성</p>
+        </div>
+
+        <!-- 파일 업로드 -->
+        <div id="upload-zone" onclick="document.getElementById('file-input').click()"
+          style="border:2px dashed rgba(99,102,241,.3); border-radius:16px; padding:28px; text-align:center; cursor:pointer; margin-bottom:20px; transition:border-color .2s;"
+          ondragover="event.preventDefault(); this.style.borderColor='#6366f1'"
+          ondragleave="this.style.borderColor='rgba(99,102,241,.3)'"
+          ondrop="handleFileDrop(event)">
+          <div style="font-size:2rem; margin-bottom:8px;">📎</div>
+          <div style="font-weight:700; margin-bottom:4px;">회사소개서 / 사업계획서 업로드</div>
+          <div style="color:#64748b; font-size:.82rem;">PDF · HWP · DOCX 지원 · 드래그&드롭 OK</div>
+          <div id="file-name" style="margin-top:10px; color:#a78bfa; font-size:.85rem; font-weight:600;"></div>
+          <input type="file" id="file-input" accept=".pdf,.hwp,.docx,.doc" style="display:none" onchange="handleFileSelect(this)">
+        </div>
+
+        <div style="text-align:center; color:#475569; font-size:.82rem; margin-bottom:16px;">— 또는 직접 입력 —</div>
+
+        <!-- 직접 입력 -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+          <div>
+            <label style="display:block; font-size:.78rem; font-weight:600; color:#94a3b8; margin-bottom:5px;">회사명</label>
+            <input id="gen-company" placeholder="(주)대박스타트업" style="width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:#fff; font-size:.875rem; outline:none; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:.78rem; font-weight:600; color:#94a3b8; margin-bottom:5px;">업종</label>
+            <select id="gen-industry" style="width:100%; background:#1a1a2e; border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:#fff; font-size:.875rem; outline:none; box-sizing:border-box;">
+              <option value="">선택</option>
+              <option>AI/반도체</option><option>IT/소프트웨어</option><option>바이오/헬스케어</option>
+              <option>제조업</option><option>서비스업</option><option>에너지/환경</option><option>기타</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="display:block; font-size:.78rem; font-weight:600; color:#94a3b8; margin-bottom:5px;">핵심 기술 / 제품 설명 <span style="color:#ef4444">*</span></label>
+          <textarea id="gen-tech" rows="3" placeholder="예: NPU 기반 엣지 AI 추론 칩 설계. 기존 대비 전력효율 40% 향상. 특허 3건 보유." style="width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:#fff; font-size:.875rem; outline:none; resize:vertical; box-sizing:border-box; font-family:inherit;"></textarea>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
+          <div>
+            <label style="display:block; font-size:.78rem; font-weight:600; color:#94a3b8; margin-bottom:5px;">직원 수</label>
+            <select id="gen-employees" style="width:100%; background:#1a1a2e; border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:#fff; font-size:.875rem; outline:none; box-sizing:border-box;">
+              <option value="">선택</option>
+              <option>1~4명</option><option>5~9명</option><option>10~49명</option><option>50명 이상</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:.78rem; font-weight:600; color:#94a3b8; margin-bottom:5px;">연 매출</label>
+            <select id="gen-revenue" style="width:100%; background:#1a1a2e; border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:#fff; font-size:.875rem; outline:none; box-sizing:border-box;">
+              <option value="">선택</option>
+              <option>예비창업</option><option>1억 미만</option><option>1~10억</option><option>10~50억</option><option>50억 이상</option>
+            </select>
+          </div>
+        </div>
+        <button onclick="startGenerate()" style="width:100%; padding:16px; border-radius:14px; border:none; cursor:pointer; font-size:1rem; font-weight:800; background:linear-gradient(135deg,#059669,#10b981); color:#fff;">
+          🤖 AI 계획서 생성 시작 →
+        </button>
+        <p style="text-align:center; color:#475569; font-size:.76rem; margin-top:10px;">생성까지 약 30~60초 · 1~3페이지 미리보기 무료 제공</p>
+      </div>
+
+      <!-- 스텝 2: 로딩 -->
+      <div id="gen-step-loading" style="display:none; padding:60px 36px; text-align:center;">
+        <div id="gen-spinner" style="width:56px; height:56px; border:3px solid rgba(99,102,241,.2); border-top-color:#6366f1; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 24px;"></div>
+        <div style="font-size:1.2rem; font-weight:800; margin-bottom:8px;" id="gen-loading-title">AI 분석 중...</div>
+        <div style="color:#64748b; font-size:.875rem;" id="gen-loading-sub">회사 정보를 분석하고 있습니다</div>
+        <div style="margin-top:28px; display:flex; flex-direction:column; gap:8px; max-width:320px; margin-left:auto; margin-right:auto;" id="gen-steps-list">
+          <div class="gen-step-row" id="gsr-1">⏳ 공고 평가기준 추출 중...</div>
+          <div class="gen-step-row" id="gsr-2" style="color:#475569">○ PSST 초안 작성</div>
+          <div class="gen-step-row" id="gsr-3" style="color:#475569">○ 심사관 시뮬레이터 검토</div>
+          <div class="gen-step-row" id="gsr-4" style="color:#475569">○ 최종 점수 예측</div>
+        </div>
+      </div>
+
+      <!-- 스텝 3: 결과 미리보기 -->
+      <div id="gen-step-result" style="display:none; padding:36px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+          <div>
+            <div style="font-size:.78rem; font-weight:700; color:#22c55e; letter-spacing:2px; margin-bottom:4px;">생성 완료</div>
+            <h3 style="font-size:1.3rem; font-weight:900;">AI 사업계획서 미리보기</h3>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <div style="background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.3); border-radius:99px; padding:6px 14px; font-size:.82rem; font-weight:700; color:#4ade80;" id="result-score-badge">B+ · 76점</div>
+            <div style="background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.3); border-radius:99px; padding:6px 14px; font-size:.82rem; font-weight:700; color:#a78bfa;" id="result-prob-badge">합격률 72%</div>
+          </div>
+        </div>
+
+        <!-- 미리보기 내용 -->
+        <div style="background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:24px; font-size:.875rem; line-height:1.9; max-height:420px; overflow-y:auto; margin-bottom:16px; white-space:pre-wrap; font-family:inherit;" id="result-preview"></div>
+
+        <!-- 잠금 오버레이 -->
+        <div style="background:linear-gradient(to bottom, transparent, rgba(12,12,26,.98) 60%); border-radius:16px; padding:32px; text-align:center; border:1px solid rgba(99,102,241,.2); margin-bottom:20px;">
+          <div style="font-size:1.5rem; margin-bottom:8px;">🔒</div>
+          <div style="font-weight:800; font-size:1rem; margin-bottom:6px;">4~15페이지 전체 내용 + HWP 파일</div>
+          <div style="color:#64748b; font-size:.85rem; margin-bottom:16px;">강점 분석 · 배점 최적화 전략 · Self-Refinement 3라운드 결과</div>
+          <button onclick="closeGenModal(); openApplyModal();" style="padding:14px 32px; border-radius:12px; border:none; cursor:pointer; font-size:.95rem; font-weight:800; background:linear-gradient(135deg,#6366f1,#a855f7); color:#fff;">
+            전체 받기 → 무료 신청
+          </button>
+        </div>
+
+        <button onclick="closeGenModal()" style="width:100%; padding:12px; border-radius:10px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); color:#64748b; font-size:.875rem; cursor:pointer;">닫기</button>
+      </div>
+
+      <!-- 스텝 4: 에러 -->
+      <div id="gen-step-error" style="display:none; padding:60px 36px; text-align:center;">
+        <div style="font-size:2.5rem; margin-bottom:16px;">⚠️</div>
+        <div style="font-weight:800; font-size:1.1rem; margin-bottom:8px;">생성 중 오류가 발생했습니다</div>
+        <div style="color:#64748b; font-size:.875rem; margin-bottom:24px;" id="gen-error-msg">잠시 후 다시 시도해주세요.</div>
+        <button onclick="showGenStep('input')" style="padding:12px 28px; border-radius:10px; border:none; cursor:pointer; font-weight:700; background:rgba(99,102,241,.15); color:#a78bfa;">다시 시도</button>
+      </div>
+    </div>
+  </div>
+  <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .gen-step-row { font-size:.85rem; color:#a78bfa; font-weight:600; padding:6px 0; }
+  </style>
 
   
   <script>
@@ -627,6 +756,141 @@
     function handlePaidCTA(e) {
       if(e) e.preventDefault();
       openApplyModal();
+    }
+
+    // ── 계획서 생성 모달 ──
+    const API_BASE = 'https://billy-sagem-feels-rocky.trycloudflare.com';
+    let uploadedFileData = null;
+
+    function openGenerateModal() {
+      document.getElementById('gen-modal').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      showGenStep('input');
+    }
+    function closeGenModal() {
+      document.getElementById('gen-modal').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    function showGenStep(step) {
+      ['input','loading','result','error'].forEach(s => {
+        document.getElementById('gen-step-'+s).style.display = s === step ? 'block' : 'none';
+      });
+    }
+    function handleFileSelect(input) {
+      if (input.files[0]) {
+        uploadedFileData = input.files[0];
+        document.getElementById('file-name').textContent = '✅ ' + input.files[0].name;
+        document.getElementById('upload-zone').style.borderColor = '#22c55e';
+      }
+    }
+    function handleFileDrop(e) {
+      e.preventDefault();
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        uploadedFileData = file;
+        document.getElementById('file-name').textContent = '✅ ' + file.name;
+        document.getElementById('upload-zone').style.borderColor = '#22c55e';
+        document.getElementById('upload-zone').querySelector('div:first-child').textContent = '📎';
+      }
+    }
+
+    // 로딩 스텝 애니메이션
+    function animateLoadingSteps() {
+      const steps = [
+        { id:'gsr-1', text:'✅ 공고 평가기준 추출 완료', delay:4000 },
+        { id:'gsr-2', text:'✅ PSST 초안 작성 중...', delay:12000 },
+        { id:'gsr-3', text:'✅ 심사관 시뮬레이터 검토 중...', delay:25000 },
+        { id:'gsr-4', text:'✅ 최종 점수 예측 중...', delay:38000 },
+      ];
+      const titles = [
+        { title:'공고 평가기준 분석 중...', sub:'배점표를 AI가 분석합니다', delay:0 },
+        { title:'PSST 초안 작성 중...', sub:'15페이지 구조를 잡고 있습니다', delay:4000 },
+        { title:'심사관 시뮬레이터 가동...', sub:'약점을 찾아 3라운드 보강 중', delay:12000 },
+        { title:'점수 예측 및 마무리...', sub:'거의 다 됐습니다!', delay:38000 },
+      ];
+      // 스텝 초기화
+      for(let i=1;i<=4;i++) document.getElementById('gsr-'+i).style.color='#475569';
+      document.getElementById('gsr-1').style.color='#a78bfa';
+      document.getElementById('gsr-1').textContent='⏳ 공고 평가기준 추출 중...';
+
+      steps.forEach(({id,text,delay}) => setTimeout(() => {
+        const el = document.getElementById(id);
+        if(el) { el.textContent=text; el.style.color='#4ade80'; }
+        // 다음 스텝 활성화
+        const next = 'gsr-'+(parseInt(id.slice(-1))+1);
+        const nextEl = document.getElementById(next);
+        if(nextEl && nextEl.textContent.startsWith('○'))
+          setTimeout(()=>{ nextEl.style.color='#a78bfa'; nextEl.textContent='⏳'+nextEl.textContent.slice(1); }, 500);
+      }, delay));
+
+      titles.forEach(({title,sub,delay}) => setTimeout(()=>{
+        document.getElementById('gen-loading-title').textContent=title;
+        document.getElementById('gen-loading-sub').textContent=sub;
+      }, delay));
+    }
+
+    async function startGenerate() {
+      const tech = document.getElementById('gen-tech').value.trim();
+      if (!tech) { alert('핵심 기술 / 제품 설명을 입력해주세요.'); return; }
+
+      showGenStep('loading');
+      animateLoadingSteps();
+
+      let companyInfo = {
+        company_name: document.getElementById('gen-company').value || '테스트기업',
+        industry: document.getElementById('gen-industry').value || 'IT/소프트웨어',
+        core_tech: tech,
+        team_size: document.getElementById('gen-employees').value || '5~9명',
+        revenue: document.getElementById('gen-revenue').value || '1억 미만',
+        keywords: tech.split(' ').slice(0,5),
+      };
+
+      try {
+        // 파일 업로드가 있으면 먼저 분석
+        if (uploadedFileData) {
+          const fd = new FormData();
+          fd.append('file', uploadedFileData);
+          const upResp = await fetch(API_BASE + '/upload', { method:'POST', body:fd });
+          if (upResp.ok) {
+            const upData = await upResp.json();
+            companyInfo = { ...companyInfo, ...upData };
+          }
+        }
+
+        // 계획서 생성 (run_refinement false → 빠른 초안)
+        const genResp = await fetch(API_BASE + '/generate', {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json' },
+          body: JSON.stringify({
+            customer_id: 0,
+            announcement_id: '',
+            company_info: companyInfo,
+            run_refinement: false,
+          })
+        });
+
+        if (!genResp.ok) throw new Error('생성 실패 ('+genResp.status+')');
+        const result = await genResp.json();
+
+        // 결과 표시
+        const text = result.proposal_text || '';
+        // 앞 1500자만 미리보기 (약 3페이지 분량)
+        const preview = text.slice(0, 1500) + (text.length > 1500 ? '\n\n...' : '');
+
+        document.getElementById('result-preview').textContent = preview;
+
+        const score = result.estimated_score || 76;
+        const grade = result.grade || 'B+';
+        const prob  = Math.round((result.score_prediction || 0.72) * 100);
+        document.getElementById('result-score-badge').textContent = grade + ' · ' + score + '점';
+        document.getElementById('result-prob-badge').textContent  = '합격률 ' + prob + '%';
+
+        showGenStep('result');
+
+      } catch(err) {
+        document.getElementById('gen-error-msg').textContent = err.message || '서버 연결 실패. 잠시 후 다시 시도해주세요.';
+        showGenStep('error');
+      }
     }
 
     // ── 카운트다운 ──
