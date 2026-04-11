@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="index.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     /* ── 계산기 ── */
     .calc-section { padding: 0 0 80px; }
@@ -653,10 +654,25 @@
             </select>
           </div>
         </div>
-        <button onclick="startGenerate()" style="width:100%; padding:16px; border-radius:14px; border:none; cursor:pointer; font-size:1rem; font-weight:800; background:linear-gradient(135deg,#059669,#10b981); color:#fff;">
-          🤖 AI 계획서 생성 시작 →
+        <button onclick="findMatchingGrants()" style="width:100%; padding:16px; border-radius:14px; border:none; cursor:pointer; font-size:1rem; font-weight:800; background:linear-gradient(135deg,#6366f1,#a855f7); color:#fff;">
+          🔍 맞춤 공고 찾기 →
         </button>
-        <p style="text-align:center; color:#475569; font-size:.76rem; margin-top:10px;">생성까지 약 30~60초 · 1~3페이지 미리보기 무료 제공</p>
+        <p style="text-align:center; color:#475569; font-size:.76rem; margin-top:10px;">공고별 배점표를 분석해 합격률을 최대화합니다</p>
+      </div>
+
+      <!-- 스텝 1.5: 공고 선택 -->
+      <div id="gen-step-grants" style="display:none; padding:40px 36px;">
+        <button onclick="closeGenModal()" style="position:absolute; top:16px; right:20px; background:none; border:none; color:#64748b; font-size:1.5rem; cursor:pointer;">×</button>
+        <button onclick="showGenStep('input')" style="background:none; border:none; color:#6366f1; font-size:.85rem; font-weight:600; cursor:pointer; margin-bottom:20px; padding:0;">← 다시 입력</button>
+        <div style="font-size:.8rem; font-weight:700; color:#6366f1; letter-spacing:2px; margin-bottom:8px;">STEP 2 / 3</div>
+        <h3 style="font-size:1.3rem; font-weight:900; margin-bottom:6px;">신청할 공고를 선택하세요</h3>
+        <p style="color:#64748b; font-size:.875rem; margin-bottom:24px;">선택한 공고의 배점표를 AI가 분석해 합격 최적화 계획서를 작성합니다</p>
+        <div id="grant-list" style="display:flex; flex-direction:column; gap:10px; max-height:360px; overflow-y:auto;"></div>
+        <div style="margin-top:20px; padding-top:16px; border-top:1px solid rgba(255,255,255,.06);">
+          <button onclick="startGenerate()" style="width:100%; padding:14px; border-radius:12px; border:1px dashed rgba(99,102,241,.4); background:transparent; color:#94a3b8; font-size:.875rem; font-weight:600; cursor:pointer;">
+            공고 없이 일반 계획서 작성하기
+          </button>
+        </div>
       </div>
 
       <!-- 스텝 2: 로딩 -->
@@ -828,6 +844,11 @@
     function openGenerateModal() {
       document.getElementById('gen-modal').style.display = 'flex';
       document.body.style.overflow = 'hidden';
+      _selectedAnnouncementId = '';
+      _companyInfoCache = null;
+      uploadedFileData = null;
+      document.getElementById('file-name').textContent = '';
+      document.getElementById('upload-zone').style.borderColor = 'rgba(99,102,241,.3)';
       showGenStep('input');
     }
     function closeGenModal() {
@@ -835,7 +856,7 @@
       document.body.style.overflow = '';
     }
     function showGenStep(step) {
-      ['input','loading','result','error'].forEach(s => {
+      ['input','grants','loading','result','error'].forEach(s => {
         document.getElementById('gen-step-'+s).style.display = s === step ? 'block' : 'none';
       });
     }
@@ -855,6 +876,100 @@
         document.getElementById('upload-zone').style.borderColor = '#22c55e';
         document.getElementById('upload-zone').querySelector('div:first-child').textContent = '📎';
       }
+    }
+
+    // ── 마크다운 렌더러 설정 ──
+    if (typeof marked !== 'undefined') {
+      marked.setOptions({ breaks: true, gfm: true });
+    }
+    function renderMarkdown(md) {
+      if (typeof marked !== 'undefined') return marked.parse(md);
+      return md.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    }
+
+    // ── 공고 매칭 ──
+    let _selectedAnnouncementId = '';
+    let _companyInfoCache = null;
+
+    async function findMatchingGrants() {
+      const tech = document.getElementById('gen-tech').value.trim();
+      if (!tech) { alert('핵심 기술 / 제품 설명을 입력해주세요.'); return; }
+
+      _companyInfoCache = {
+        company_name: document.getElementById('gen-company').value || '테스트기업',
+        industry: document.getElementById('gen-industry').value || 'IT/소프트웨어',
+        core_tech: tech,
+        team_size: document.getElementById('gen-employees').value || '5~9명',
+        revenue: document.getElementById('gen-revenue').value || '1억 미만',
+        keywords: tech.split(/[\s,]+/).slice(0,5),
+      };
+
+      // 파일 업로드 있으면 먼저 분석
+      if (uploadedFileData) {
+        const fd = new FormData();
+        fd.append('file', uploadedFileData);
+        try {
+          const upResp = await fetch(API_BASE + '/upload', { method:'POST', body:fd });
+          if (upResp.ok) { const d = await upResp.json(); _companyInfoCache = {..._companyInfoCache, ...d}; }
+        } catch {}
+      }
+
+      const list = document.getElementById('grant-list');
+      list.innerHTML = '<div style="text-align:center;color:#64748b;padding:20px">공고 검색 중...</div>';
+      showGenStep('grants');
+
+      try {
+        const resp = await fetch(API_BASE + '/match', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({
+            name: _companyInfoCache.company_name,
+            industry: _companyInfoCache.industry,
+            keywords: _companyInfoCache.keywords,
+            description: tech,
+          }),
+        });
+        if (!resp.ok) throw new Error('매칭 실패');
+        const data = await resp.json();
+        const matches = data.matches || [];
+
+        if (!matches.length) {
+          list.innerHTML = '<div style="text-align:center;color:#64748b;padding:20px;">매칭 공고가 없습니다. 일반 계획서로 진행하세요.</div>';
+          return;
+        }
+
+        list.innerHTML = '';
+        matches.forEach((m) => {
+          const dday = m.end_date ? Math.ceil((new Date(m.end_date) - Date.now()) / 86400000) : null;
+          const ddayBadge = dday !== null
+            ? `<span style="font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:99px;background:${dday<=7?'rgba(239,68,68,.15)':'rgba(99,102,241,.12)'};color:${dday<=7?'#ef4444':'#a78bfa'};">D-${dday}</span>`
+            : '';
+          list.innerHTML += `
+            <div onclick="selectGrant('${m.id}', this)" data-grant-id="${m.id}"
+              style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px 18px;cursor:pointer;transition:all .2s;">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;">
+                <div style="font-size:.9rem;font-weight:700;line-height:1.4;">${m.title || '공고명 없음'}</div>
+                ${ddayBadge}
+              </div>
+              <div style="font-size:.78rem;color:#64748b;">${m.org || ''} ${m.amount ? '· ' + m.amount : ''}</div>
+              <div style="margin-top:8px;font-size:.75rem;font-weight:700;color:#6366f1;">선택 →</div>
+            </div>`;
+        });
+      } catch(e) {
+        list.innerHTML = `<div style="text-align:center;color:#ef4444;padding:20px">${e.message}</div>`;
+      }
+    }
+
+    function selectGrant(id, el) {
+      _selectedAnnouncementId = id;
+      document.querySelectorAll('[data-grant-id]').forEach(el => {
+        el.style.border = '1px solid rgba(255,255,255,.08)';
+        el.style.background = 'rgba(255,255,255,.04)';
+      });
+      el.style.border = '1px solid #6366f1';
+      el.style.background = 'rgba(99,102,241,.12)';
+      el.querySelector('div:last-child').textContent = '✅ 선택됨';
+      setTimeout(() => startGenerate(), 600);
     }
 
     // ── 진행 스텝 헬퍼 ──
@@ -908,26 +1023,80 @@
       a.click();
     }
 
-    // ── 결과 렌더링 ──
+    // ── 결과 렌더링 (마크다운 → HTML + CSS 오버레이) ──
     function renderResult(result) {
       const text = result.proposal_text || '';
-      const PAGE_STYLE = `background:#fff;color:#1a1a1a;border-radius:8px;padding:32px 36px;font-size:.82rem;line-height:1.85;white-space:pre-wrap;font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;min-height:280px;border:1px solid rgba(255,255,255,.1);position:relative;`;
-      const pages = splitPages(text);
-      const visiblePages = pages.slice(0, 3);
-      const blurredPages = pages.slice(3, 12);
+
+      // 마크다운을 섹션(##/###/□) 단위로 분할
+      function splitSections(md) {
+        const lines = md.split('\n');
+        const sections = [];
+        let cur = [];
+        for (const line of lines) {
+          if ((line.match(/^#{1,3}\s/) || line.startsWith('□')) && cur.length > 3) {
+            sections.push(cur.join('\n'));
+            cur = [line];
+          } else {
+            cur.push(line);
+          }
+        }
+        if (cur.length) sections.push(cur.join('\n'));
+        // 섹션이 너무 작으면 합치기
+        const merged = [];
+        let acc = '';
+        for (const s of sections) {
+          acc = acc ? acc + '\n\n' + s : s;
+          if (acc.length > 800) { merged.push(acc); acc = ''; }
+        }
+        if (acc) merged.push(acc);
+        return merged.length ? merged : [md];
+      }
+
+      const MD_STYLE = `
+        background:#fff; color:#1a1a1a; border-radius:8px; padding:28px 32px;
+        font-size:.82rem; line-height:1.8;
+        font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;
+        min-height:220px; border:1px solid rgba(0,0,0,.07); position:relative;`;
+      const MD_INNER_STYLE = `
+        h1,h2{font-size:1.05rem;font-weight:800;color:#003366;margin:16px 0 8px;border-bottom:2px solid #e8edf5;padding-bottom:4px;}
+        h3{font-size:.92rem;font-weight:700;color:#1a3a5c;margin:12px 0 6px;}
+        table{border-collapse:collapse;width:100%;font-size:.78rem;margin:12px 0;}
+        th{background:#eef2ff;color:#003366;padding:6px 8px;border:1px solid #cbd5e1;font-weight:700;}
+        td{padding:6px 8px;border:1px solid #e2e8f0;}
+        tr:nth-child(even) td{background:#f8fafc;}
+        ul,ol{padding-left:20px;margin:6px 0;}
+        li{margin:3px 0;}
+        strong{color:#003366;}
+        p{margin:4px 0;}`;
+
+      const sections = splitSections(text);
+      const visibleSections = sections.slice(0, 3);
+      const blurredSections = sections.slice(3, 12);
 
       const visibleContainer = document.getElementById('result-pages-visible');
       visibleContainer.innerHTML = '';
-      visiblePages.forEach((pt, idx) => {
-        visibleContainer.innerHTML += `<div style="${PAGE_STYLE}"><div style="position:absolute;top:10px;right:14px;font-size:.7rem;color:#94a3b8;">📄 ${idx+1}페이지</div>${pt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}</div>`;
+      visibleSections.forEach((sec, idx) => {
+        const html = renderMarkdown(sec);
+        visibleContainer.innerHTML += `
+          <div style="${MD_STYLE}">
+            <style scoped>${MD_INNER_STYLE}</style>
+            <div style="position:absolute;top:10px;right:14px;font-size:.7rem;color:#94a3b8;">📄 ${idx+1}페이지</div>
+            <div>${html}</div>
+          </div>`;
       });
 
       const blurContainer = document.getElementById('result-pages-blurred');
       blurContainer.innerHTML = '';
-      const dummy = '█████ ████████ ████ ██████████\n██████ ████ ███████████ ████\n████████ ██████ ████ █████████████\n';
-      for (let p = 0; p < Math.max(blurredPages.length, 6); p++) {
-        const pt = blurredPages[p] || dummy.repeat(10);
-        blurContainer.innerHTML += `<div style="${PAGE_STYLE}"><div style="position:absolute;top:10px;right:14px;font-size:.7rem;color:#94a3b8;">📄 ${p+4}페이지</div>${pt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}</div>`;
+      const dummyMd = '## ████ ███████ ████\n\n| ████ | ████████ | ████ |\n|------|---------|------|\n| ████ | ██████ | ██ |\n| ███████ | ████ | ██████ |\n\n- ██████ ████████ ████████████\n- ████ ██████████ ███\n\n';
+      for (let p = 0; p < Math.max(blurredSections.length, 5); p++) {
+        const sec = blurredSections[p] || dummyMd.repeat(3);
+        const html = renderMarkdown(sec);
+        blurContainer.innerHTML += `
+          <div style="${MD_STYLE}">
+            <style scoped>${MD_INNER_STYLE}</style>
+            <div style="position:absolute;top:10px;right:14px;font-size:.7rem;color:#94a3b8;">📄 ${p+4}페이지</div>
+            <div>${html}</div>
+          </div>`;
       }
 
       const score = result.estimated_score || 76;
@@ -936,10 +1105,9 @@
       document.getElementById('result-score-badge').textContent = grade + ' · ' + score + '점';
       document.getElementById('result-prob-badge').textContent  = '합격률 ' + prob + '%';
 
-      // PDF 다운로드 버튼
       if (result.pdf_b64) {
         _pdfB64 = result.pdf_b64;
-        _pdfFilename = (result.company_name || '사업계획서') + '_GrantAI.pdf';
+        _pdfFilename = (_companyInfoCache?.company_name || '사업계획서') + '_GrantAI.pdf';
         document.getElementById('btn-download-pdf').style.display = 'block';
       }
 
@@ -947,45 +1115,35 @@
     }
 
     async function startGenerate() {
-      const tech = document.getElementById('gen-tech').value.trim();
-      if (!tech) { alert('핵심 기술 / 제품 설명을 입력해주세요.'); return; }
-
       showGenStep('loading');
       resetSteps();
       setStep('criteria', false, '공고 평가기준 분석 중...');
       _pdfB64 = null;
       document.getElementById('btn-download-pdf').style.display = 'none';
 
-      let companyInfo = {
-        company_name: document.getElementById('gen-company').value || '테스트기업',
-        industry: document.getElementById('gen-industry').value || 'IT/소프트웨어',
-        core_tech: tech,
-        team_size: document.getElementById('gen-employees').value || '5~9명',
-        revenue: document.getElementById('gen-revenue').value || '1억 미만',
-        keywords: tech.split(' ').slice(0,5),
-      };
+      // 공고 선택 스텝에서 넘어온 경우 캐시된 정보 사용
+      let companyInfo = _companyInfoCache;
+      if (!companyInfo) {
+        const tech = document.getElementById('gen-tech').value.trim();
+        if (!tech) { showGenStep('input'); alert('핵심 기술 / 제품 설명을 입력해주세요.'); return; }
+        companyInfo = {
+          company_name: document.getElementById('gen-company').value || '테스트기업',
+          industry: document.getElementById('gen-industry').value || 'IT/소프트웨어',
+          core_tech: tech,
+          team_size: document.getElementById('gen-employees').value || '5~9명',
+          revenue: document.getElementById('gen-revenue').value || '1억 미만',
+          keywords: tech.split(/[\s,]+/).slice(0,5),
+        };
+      }
 
       try {
-        // 파일 업로드가 있으면 먼저 분석
-        if (uploadedFileData) {
-          document.getElementById('gen-loading-title').textContent = '파일 분석 중...';
-          document.getElementById('gen-loading-sub').textContent = '업로드한 문서에서 정보를 추출합니다';
-          const fd = new FormData();
-          fd.append('file', uploadedFileData);
-          const upResp = await fetch(API_BASE + '/upload', { method:'POST', body:fd });
-          if (upResp.ok) {
-            const upData = await upResp.json();
-            companyInfo = { ...companyInfo, ...upData };
-          }
-        }
-
-        // SSE 스트리밍으로 계획서 생성
+        // SSE 스트리밍으로 계획서 생성 (선택된 announcement_id 포함)
         const resp = await fetch(API_BASE + '/generate-stream', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             customer_id: 0,
-            announcement_id: '',
+            announcement_id: _selectedAnnouncementId || '',
             company_info: companyInfo,
             run_refinement: true,
           }),
