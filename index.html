@@ -133,9 +133,16 @@
         <a href="#urgent">마감 임박</a>
         <a href="#pricing">가격</a>
         <a href="#faq">FAQ</a>
-        <button class="nav-cta" onclick="document.getElementById('calc-btn').click()">
-          지원금 계산하기 →
-        </button>
+        <!-- 로그인 전 -->
+        <div id="nav-auth-guest" style="display:flex;gap:8px;align-items:center;">
+          <button onclick="openAuthModal('login')" style="background:none;border:1px solid rgba(255,255,255,.15);color:#94a3b8;padding:8px 16px;border-radius:50px;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor='#6366f1';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(255,255,255,.15)';this.style.color='#94a3b8'">로그인</button>
+          <button onclick="openAuthModal('signup')" class="nav-cta">무료 시작 →</button>
+        </div>
+        <!-- 로그인 후 -->
+        <div id="nav-auth-user" style="display:none;gap:8px;align-items:center;">
+          <span id="nav-user-badge" style="font-size:.82rem;font-weight:700;color:#a78bfa;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);padding:6px 14px;border-radius:99px;"></span>
+          <button onclick="logout()" style="background:none;border:none;color:#475569;font-size:.82rem;cursor:pointer;font-weight:600;">로그아웃</button>
+        </div>
       </div>
     </div>
   </nav>
@@ -550,6 +557,52 @@
     </div>
   </section>
 
+  <!-- 로그인 / 회원가입 모달 -->
+  <div id="auth-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:16px;">
+    <div onclick="closeAuthModal()" style="position:absolute;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);"></div>
+    <div style="position:relative;background:#0f0f1e;border:1px solid rgba(99,102,241,.35);border-radius:28px;padding:40px 36px;width:100%;max-width:420px;z-index:1;">
+      <button onclick="closeAuthModal()" style="position:absolute;top:16px;right:20px;background:none;border:none;color:#64748b;font-size:1.4rem;cursor:pointer;">×</button>
+
+      <!-- 탭 -->
+      <div style="display:flex;gap:0;margin-bottom:28px;background:rgba(255,255,255,.04);border-radius:12px;padding:4px;">
+        <button id="tab-login" onclick="switchAuthTab('login')" style="flex:1;padding:10px;border-radius:9px;border:none;cursor:pointer;font-weight:700;font-size:.9rem;transition:all .2s;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;">로그인</button>
+        <button id="tab-signup" onclick="switchAuthTab('signup')" style="flex:1;padding:10px;border-radius:9px;border:none;cursor:pointer;font-weight:700;font-size:.9rem;transition:all .2s;background:none;color:#64748b;">회원가입</button>
+      </div>
+
+      <!-- 로그인 폼 -->
+      <div id="auth-login-form">
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:.78rem;font-weight:600;color:#94a3b8;margin-bottom:6px;">이메일</label>
+          <input id="login-email" type="email" placeholder="example@company.com" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;color:#fff;font-size:.9rem;outline:none;box-sizing:border-box;" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <div style="margin-bottom:20px;">
+          <label style="display:block;font-size:.78rem;font-weight:600;color:#94a3b8;margin-bottom:6px;">비밀번호</label>
+          <input id="login-pw" type="password" placeholder="비밀번호 입력" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;color:#fff;font-size:.9rem;outline:none;box-sizing:border-box;" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <div id="login-error" style="display:none;color:#ef4444;font-size:.82rem;margin-bottom:12px;text-align:center;"></div>
+        <button onclick="doLogin()" id="btn-do-login" style="width:100%;padding:14px;border-radius:12px;border:none;cursor:pointer;font-size:1rem;font-weight:800;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;">로그인</button>
+      </div>
+
+      <!-- 회원가입 폼 -->
+      <div id="auth-signup-form" style="display:none;">
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:.78rem;font-weight:600;color:#94a3b8;margin-bottom:6px;">이름</label>
+          <input id="signup-name" type="text" placeholder="홍길동" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;color:#fff;font-size:.9rem;outline:none;box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:.78rem;font-weight:600;color:#94a3b8;margin-bottom:6px;">이메일</label>
+          <input id="signup-email" type="email" placeholder="example@company.com" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;color:#fff;font-size:.9rem;outline:none;box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:20px;">
+          <label style="display:block;font-size:.78rem;font-weight:600;color:#94a3b8;margin-bottom:6px;">비밀번호</label>
+          <input id="signup-pw" type="password" placeholder="6자 이상" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;color:#fff;font-size:.9rem;outline:none;box-sizing:border-box;">
+        </div>
+        <div id="signup-error" style="display:none;color:#ef4444;font-size:.82rem;margin-bottom:12px;text-align:center;"></div>
+        <button onclick="doSignup()" id="btn-do-signup" style="width:100%;padding:14px;border-radius:12px;border:none;cursor:pointer;font-size:1rem;font-weight:800;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;">가입하기</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 신청 모달 -->
   <div id="apply-modal" style="display:none; position:fixed; inset:0; z-index:9999; align-items:center; justify-content:center; padding:16px;">
     <div onclick="if(event.target===this)closeApplyModal()" style="position:absolute; inset:0; background:rgba(0,0,0,.75); backdrop-filter:blur(8px);"></div>
@@ -721,7 +774,7 @@
           <div style="display:flex; flex-direction:column; gap:10px; position:relative;">
             <div id="result-pages-blurred" style="display:flex; flex-direction:column; gap:10px; filter:blur(5px); user-select:none; pointer-events:none;"></div>
             <!-- 잠금 오버레이 -->
-            <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(to bottom, rgba(12,12,26,.3) 0%, rgba(12,12,26,.97) 40%); border-radius:12px; padding:24px; text-align:center; z-index:2;">
+            <div id="lock-overlay" style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(to bottom, rgba(12,12,26,.3) 0%, rgba(12,12,26,.97) 40%); border-radius:12px; padding:24px; text-align:center; z-index:2;">
               <div style="font-size:2rem; margin-bottom:8px;">🔒</div>
               <div style="font-weight:800; font-size:1rem; margin-bottom:6px;">4~15페이지 + PDF 다운로드</div>
               <div style="color:#94a3b8; font-size:.82rem; margin-bottom:18px;">강점 분석 · 배점 최적화 전략 · 고용창출·해외진출 섹션 · 성능지표 표</div>
@@ -877,6 +930,107 @@
         document.getElementById('upload-zone').querySelector('div:first-child').textContent = '📎';
       }
     }
+
+    // ── 인증 ──
+    const _SESSION_KEY = 'grantai_session';
+    let _currentUser = null;
+
+    function _loadSession() {
+      try {
+        const s = localStorage.getItem(_SESSION_KEY);
+        if (s) _currentUser = JSON.parse(s);
+      } catch {}
+    }
+    function _saveSession(user) {
+      _currentUser = user;
+      localStorage.setItem(_SESSION_KEY, JSON.stringify(user));
+    }
+    function logout() {
+      _currentUser = null;
+      localStorage.removeItem(_SESSION_KEY);
+      _updateNavAuth();
+    }
+    function _updateNavAuth() {
+      const isLoggedIn = !!_currentUser;
+      document.getElementById('nav-auth-guest').style.display = isLoggedIn ? 'none' : 'flex';
+      document.getElementById('nav-auth-user').style.display  = isLoggedIn ? 'flex' : 'none';
+      if (isLoggedIn) {
+        const badge = document.getElementById('nav-user-badge');
+        const isDev = _currentUser.role === 'dev';
+        badge.textContent = (isDev ? '🛠 ' : '') + _currentUser.name;
+        badge.style.color = isDev ? '#f59e0b' : '#a78bfa';
+        badge.style.background = isDev ? 'rgba(245,158,11,.12)' : 'rgba(99,102,241,.12)';
+        badge.style.borderColor = isDev ? 'rgba(245,158,11,.3)' : 'rgba(99,102,241,.25)';
+      }
+    }
+    function isDevUser() { return _currentUser?.role === 'dev'; }
+
+    function openAuthModal(tab = 'login') {
+      document.getElementById('auth-modal').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      switchAuthTab(tab);
+      document.getElementById('login-error').style.display = 'none';
+      document.getElementById('signup-error').style.display = 'none';
+    }
+    function closeAuthModal() {
+      document.getElementById('auth-modal').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    function switchAuthTab(tab) {
+      document.getElementById('auth-login-form').style.display  = tab === 'login'  ? 'block' : 'none';
+      document.getElementById('auth-signup-form').style.display = tab === 'signup' ? 'block' : 'none';
+      document.getElementById('tab-login').style.background  = tab === 'login'  ? 'linear-gradient(135deg,#6366f1,#a855f7)' : 'none';
+      document.getElementById('tab-login').style.color       = tab === 'login'  ? '#fff' : '#64748b';
+      document.getElementById('tab-signup').style.background = tab === 'signup' ? 'linear-gradient(135deg,#6366f1,#a855f7)' : 'none';
+      document.getElementById('tab-signup').style.color      = tab === 'signup' ? '#fff' : '#64748b';
+    }
+    async function doLogin() {
+      const email = document.getElementById('login-email').value.trim();
+      const pw    = document.getElementById('login-pw').value;
+      const errEl = document.getElementById('login-error');
+      const btn   = document.getElementById('btn-do-login');
+      if (!email || !pw) { errEl.textContent='이메일과 비밀번호를 입력해주세요.'; errEl.style.display='block'; return; }
+      btn.textContent = '로그인 중...'; btn.disabled = true;
+      try {
+        const resp = await fetch(API_BASE + '/auth/login', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({email, password: pw}),
+        });
+        if (!resp.ok) { const d = await resp.json(); throw new Error(d.detail || '로그인 실패'); }
+        const user = await resp.json();
+        _saveSession(user);
+        _updateNavAuth();
+        closeAuthModal();
+      } catch(e) {
+        errEl.textContent = e.message; errEl.style.display = 'block';
+      } finally { btn.textContent = '로그인'; btn.disabled = false; }
+    }
+    async function doSignup() {
+      const name  = document.getElementById('signup-name').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const pw    = document.getElementById('signup-pw').value;
+      const errEl = document.getElementById('signup-error');
+      const btn   = document.getElementById('btn-do-signup');
+      if (!name || !email || !pw) { errEl.textContent='모든 항목을 입력해주세요.'; errEl.style.display='block'; return; }
+      btn.textContent = '가입 중...'; btn.disabled = true;
+      try {
+        const resp = await fetch(API_BASE + '/auth/signup', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({name, email, password: pw}),
+        });
+        if (!resp.ok) { const d = await resp.json(); throw new Error(d.detail || '가입 실패'); }
+        const user = await resp.json();
+        _saveSession(user);
+        _updateNavAuth();
+        closeAuthModal();
+      } catch(e) {
+        errEl.textContent = e.message; errEl.style.display = 'block';
+      } finally { btn.textContent = '가입하기'; btn.disabled = false; }
+    }
+
+    // 페이지 로드 시 세션 복원
+    _loadSession();
+    _updateNavAuth();
 
     // ── 마크다운 렌더러 설정 ──
     if (typeof marked !== 'undefined') {
@@ -1109,6 +1263,24 @@
         _pdfB64 = result.pdf_b64;
         _pdfFilename = (_companyInfoCache?.company_name || '사업계획서') + '_GrantAI.pdf';
         document.getElementById('btn-download-pdf').style.display = 'block';
+      }
+
+      // ── dev 모드: 블러 제거 + 전체 섹션 표시 ──
+      if (isDevUser()) {
+        // 블러 컨테이너 blur 해제
+        const blurWrap = document.getElementById('result-pages-blurred');
+        blurWrap.style.filter = 'none';
+        blurWrap.style.userSelect = 'auto';
+        blurWrap.style.pointerEvents = 'auto';
+        // 잠금 오버레이 숨김
+        const overlay = document.getElementById('lock-overlay');
+        if (overlay) overlay.style.display = 'none';
+        // dev 배지 표시
+        const scoreBadge = document.getElementById('result-score-badge');
+        scoreBadge.textContent = '🛠 DEV · ' + scoreBadge.textContent;
+        scoreBadge.style.background = 'rgba(245,158,11,.12)';
+        scoreBadge.style.borderColor = 'rgba(245,158,11,.3)';
+        scoreBadge.style.color = '#f59e0b';
       }
 
       showGenStep('result');
