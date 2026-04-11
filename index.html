@@ -417,7 +417,7 @@
         <span style="background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.25); padding:5px 12px; border-radius:99px; font-size:.78rem; color:#a78bfa;">✓ 고용창출 계획</span>
         <span style="background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.25); padding:5px 12px; border-radius:99px; font-size:.78rem; color:#a78bfa;">✓ 해외진출 계획</span>
         <span style="background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.25); padding:5px 12px; border-radius:99px; font-size:.78rem; color:#a78bfa;">✓ 지원금 사용 계획표</span>
-        <span style="background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.2); padding:5px 12px; border-radius:99px; font-size:.78rem; color:#4ade80;">✓ PDF 다운로드 (프로)</span>
+        <span style="background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.2); padding:5px 12px; border-radius:99px; font-size:.78rem; color:#4ade80;">✓ HWPX 템플릿 원본 및 PT 스크립트 (프로)</span>
       </div>
     </div>
   </section>
@@ -485,13 +485,15 @@
         </div>
         <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:20px; padding:28px; text-align:center;">
           <div style="font-weight:800; font-size:1.1rem; margin-bottom:8px;">프로</div>
-          <div style="font-size:2rem; font-weight:900; margin-bottom:4px;">₩299,000</div>
+          <div style="font-size:2rem; font-weight:900; margin-bottom:4px;">₩149,000</div>
           <div style="color:var(--text-muted); font-size:.85rem; margin-bottom:20px;">/월</div>
           <ul style="text-align:left; list-style:none; padding:0; font-size:.85rem; margin-bottom:20px;">
             <li>✓ 스타터 전체 포함</li>
             <li>✓ 계획서 무제한</li>
             <li>✓ Self-Refinement 3라운드</li>
-            <li>✓ HWP 자동 출력</li>
+            <li>✓ HWPX 템플릿 원본 유지 출력</li>
+            <li>✓ 대면 발표용 5분 PT 스크립트 제공</li>
+            <li>✓ 예상 압박 질문 10개 & 방어 답변서</li>
             <li>✓ <strong>합격 보장 환불</strong></li>
           </ul>
           <button onclick="handlePaidCTA(event)" style="width:100%; padding:12px; border-radius:10px; background:rgba(99,102,241,.15); border:1px solid rgba(99,102,241,.3); color:#a78bfa; font-weight:700; cursor:pointer;">시작하기</button>
@@ -648,38 +650,42 @@
     <div onclick="if(event.target===this)closeGenModal()" style="position:absolute; inset:0; background:rgba(0,0,0,.8); backdrop-filter:blur(10px);"></div>
     <div style="position:relative; background:#0c0c1a; border:1px solid rgba(99,102,241,.3); border-radius:28px; width:100%; max-width:680px; z-index:1; margin:auto; overflow:hidden;">
 
-      <!-- 스텝 1: 입력 -->
-      <div id="gen-step-input" style="padding:40px 36px;">
-        <button onclick="closeGenModal()" style="position:absolute; top:16px; right:20px; background:none; border:none; color:#64748b; font-size:1.5rem; cursor:pointer;">×</button>
-        <div style="margin-bottom:28px;">
-          <div style="font-size:.8rem; font-weight:700; color:#6366f1; letter-spacing:2px; margin-bottom:8px;">AI 계획서 자동작성</div>
-          <h3 style="font-size:1.4rem; font-weight:900; margin-bottom:6px;">회사 정보를 알려주세요</h3>
-          <p style="color:#64748b; font-size:.875rem;">파일 업로드 또는 직접 입력 → AI가 15페이지 계획서 초안 생성</p>
+      <!-- 진행 표시바 (공통) -->
+      <div id="gen-progress-bar" style="padding:20px 36px 0; display:none;">
+        <div style="display:flex; align-items:center; gap:0; margin-bottom:4px;">
+          <div class="gp-step active" id="gp-1" style="flex:1; text-align:center; font-size:.72rem; font-weight:700; color:#6366f1; padding-bottom:8px; border-bottom:2px solid #6366f1;">① Team</div>
+          <div class="gp-step" id="gp-2" style="flex:1; text-align:center; font-size:.72rem; font-weight:700; color:#475569; padding-bottom:8px; border-bottom:2px solid rgba(255,255,255,.1);">② Problem</div>
+          <div class="gp-step" id="gp-3" style="flex:1; text-align:center; font-size:.72rem; font-weight:700; color:#475569; padding-bottom:8px; border-bottom:2px solid rgba(255,255,255,.1);">③ Scale-up</div>
+          <div class="gp-step" id="gp-4" style="flex:1; text-align:center; font-size:.72rem; font-weight:700; color:#475569; padding-bottom:8px; border-bottom:2px solid rgba(255,255,255,.1);">④ 공고 선택</div>
         </div>
+      </div>
 
-        <!-- 파일 업로드 -->
+      <!-- Step 1: Team & Solution -->
+      <div id="gen-step-input" style="padding:28px 36px 36px;">
+        <button onclick="closeGenModal()" style="position:absolute; top:16px; right:20px; background:none; border:none; color:#64748b; font-size:1.5rem; cursor:pointer;">×</button>
+        <div style="margin-bottom:20px;">
+          <div style="font-size:.75rem; font-weight:700; color:#6366f1; letter-spacing:2px; margin-bottom:6px;">STEP 1 · Team &amp; Solution</div>
+          <h3 style="font-size:1.3rem; font-weight:900; margin-bottom:4px;">팀과 솔루션을 알려주세요</h3>
+          <p style="color:#64748b; font-size:.82rem;">파일 업로드하면 자동 채워집니다</p>
+        </div>
         <div id="upload-zone" onclick="document.getElementById('file-input').click()"
-          style="border:2px dashed rgba(99,102,241,.3); border-radius:16px; padding:28px; text-align:center; cursor:pointer; margin-bottom:20px; transition:border-color .2s;"
+          style="border:2px dashed rgba(99,102,241,.3); border-radius:14px; padding:20px; text-align:center; cursor:pointer; margin-bottom:16px; transition:border-color .2s;"
           ondragover="event.preventDefault(); this.style.borderColor='#6366f1'"
           ondragleave="this.style.borderColor='rgba(99,102,241,.3)'"
           ondrop="handleFileDrop(event)">
-          <div style="font-size:2rem; margin-bottom:8px;">📎</div>
-          <div style="font-weight:700; margin-bottom:4px;">회사소개서 / 사업계획서 업로드</div>
-          <div style="color:#64748b; font-size:.82rem;">PDF · HWP · DOCX 지원 · 드래그&드롭 OK</div>
-          <div id="file-name" style="margin-top:10px; color:#a78bfa; font-size:.85rem; font-weight:600;"></div>
+          <div style="font-size:1.6rem; margin-bottom:4px;">📎</div>
+          <div style="font-weight:700; font-size:.88rem; margin-bottom:2px;">회사소개서 / 사업계획서 업로드</div>
+          <div style="color:#64748b; font-size:.78rem;">PDF · HWP · DOCX</div>
+          <div id="file-name" style="margin-top:8px; color:#a78bfa; font-size:.82rem; font-weight:600;"></div>
           <input type="file" id="file-input" accept=".pdf,.hwp,.docx,.doc" style="display:none" onchange="handleFileSelect(this)">
         </div>
-
-        <div style="text-align:center; color:#475569; font-size:.82rem; margin-bottom:16px;">— 또는 직접 입력 —</div>
-
-        <!-- 직접 입력 -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
           <div>
-            <label style="display:block; font-size:.78rem; font-weight:600; color:#94a3b8; margin-bottom:5px;">회사명</label>
+            <label style="display:block; font-size:.75rem; font-weight:600; color:#94a3b8; margin-bottom:4px;">회사명 <span style="color:#ef4444">*</span></label>
             <input id="gen-company" placeholder="(주)대박스타트업" style="width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:#fff; font-size:.875rem; outline:none; box-sizing:border-box;">
           </div>
           <div>
-            <label style="display:block; font-size:.78rem; font-weight:600; color:#94a3b8; margin-bottom:5px;">업종</label>
+            <label style="display:block; font-size:.75rem; font-weight:600; color:#94a3b8; margin-bottom:4px;">업종 <span style="color:#ef4444">*</span></label>
             <select id="gen-industry" style="width:100%; background:#1a1a2e; border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:#fff; font-size:.875rem; outline:none; box-sizing:border-box;">
               <option value="">선택</option>
               <option>AI/반도체</option><option>IT/소프트웨어</option><option>바이오/헬스케어</option>
@@ -687,64 +693,124 @@
             </select>
           </div>
         </div>
-        <div style="margin-bottom:12px;">
-          <label style="display:block; font-size:.78rem; font-weight:600; color:#94a3b8; margin-bottom:5px;">핵심 기술 / 제품 설명 <span style="color:#ef4444">*</span></label>
-          <textarea id="gen-tech" rows="3" placeholder="예: NPU 기반 엣지 AI 추론 칩 설계. 기존 대비 전력효율 40% 향상. 특허 3건 보유." style="width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:#fff; font-size:.875rem; outline:none; resize:vertical; box-sizing:border-box; font-family:inherit;"></textarea>
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-size:.75rem; font-weight:600; color:#94a3b8; margin-bottom:4px;">핵심 기술 / 제품 설명 <span style="color:#ef4444">*</span></label>
+          <textarea id="gen-tech" rows="3" placeholder="예: AI 기반 비전 인식 폐플라스틱 선별 로봇. RaaS 구독 모델." style="width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:#fff; font-size:.875rem; outline:none; resize:vertical; box-sizing:border-box; font-family:inherit;"></textarea>
         </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
           <div>
-            <label style="display:block; font-size:.78rem; font-weight:600; color:#94a3b8; margin-bottom:5px;">직원 수</label>
+            <label style="display:block; font-size:.75rem; font-weight:600; color:#94a3b8; margin-bottom:4px;">직원 수</label>
             <select id="gen-employees" style="width:100%; background:#1a1a2e; border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:#fff; font-size:.875rem; outline:none; box-sizing:border-box;">
               <option value="">선택</option>
               <option>1~4명</option><option>5~9명</option><option>10~49명</option><option>50명 이상</option>
             </select>
           </div>
           <div>
-            <label style="display:block; font-size:.78rem; font-weight:600; color:#94a3b8; margin-bottom:5px;">연 매출</label>
-            <select id="gen-revenue" style="width:100%; background:#1a1a2e; border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:#fff; font-size:.875rem; outline:none; box-sizing:border-box;">
+            <label style="display:block; font-size:.75rem; font-weight:600; color:#94a3b8; margin-bottom:4px;">설립 / 창업 시기</label>
+            <select id="gen-founded" style="width:100%; background:#1a1a2e; border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:#fff; font-size:.875rem; outline:none; box-sizing:border-box;">
               <option value="">선택</option>
-              <option>예비창업</option><option>1억 미만</option><option>1~10억</option><option>10~50억</option><option>50억 이상</option>
+              <option>예비창업</option><option>2024~2025</option><option>2022~2023</option><option>2020~2021</option><option>2019 이전</option>
             </select>
           </div>
         </div>
-        <!-- Fact-Grounding: 정량 데이터 -->
-        <div style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:14px;padding:16px 18px;margin-bottom:16px;">
-          <div style="font-size:.78rem;font-weight:700;color:#ef4444;margin-bottom:10px;">⚠️ 아래 수치는 직접 입력하세요 — AI가 임의로 만들지 않습니다</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-            <div>
-              <label style="display:block;font-size:.75rem;font-weight:600;color:#94a3b8;margin-bottom:4px;">보유 특허 수</label>
-              <input id="fact-patent" type="number" min="0" placeholder="0" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 10px;color:#fff;font-size:.875rem;outline:none;box-sizing:border-box;">
-            </div>
-            <div>
-              <label style="display:block;font-size:.75rem;font-weight:600;color:#94a3b8;margin-bottom:4px;">현재 월 매출 (만원, 없으면 0)</label>
-              <input id="fact-monthly-revenue" type="number" min="0" placeholder="0" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 10px;color:#fff;font-size:.875rem;outline:none;box-sizing:border-box;">
-            </div>
-            <div>
-              <label style="display:block;font-size:.75rem;font-weight:600;color:#94a3b8;margin-bottom:4px;">핵심 성능 개선 목표 (%)</label>
-              <input id="fact-perf" type="number" min="0" placeholder="예: 40 (기존 대비 40% 향상)" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 10px;color:#fff;font-size:.875rem;outline:none;box-sizing:border-box;">
-            </div>
-            <div>
-              <label style="display:block;font-size:.75rem;font-weight:600;color:#94a3b8;margin-bottom:4px;">신청 지원금 규모 (만원)</label>
-              <input id="fact-grant-amount" type="number" min="0" placeholder="예: 10000 (1억)" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 10px;color:#fff;font-size:.875rem;outline:none;box-sizing:border-box;">
-            </div>
-          </div>
-          <div style="margin-top:8px;">
-            <label style="display:block;font-size:.75rem;font-weight:600;color:#94a3b8;margin-bottom:4px;">기존 고객사 / MOU / 수요처 (없으면 공란)</label>
-            <input id="fact-customers" placeholder="예: (주)삼성전자 PoC 진행 중, 스타트업 3사 MOU" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 10px;color:#fff;font-size:.875rem;outline:none;box-sizing:border-box;">
-          </div>
-        </div>
-
-        <button onclick="findMatchingGrants()" style="width:100%; padding:16px; border-radius:14px; border:none; cursor:pointer; font-size:1rem; font-weight:800; background:linear-gradient(135deg,#6366f1,#a855f7); color:#fff;">
-          🔍 맞춤 공고 찾기 →
+        <button onclick="goToStep2()" style="width:100%; padding:14px; border-radius:12px; border:none; cursor:pointer; font-size:.95rem; font-weight:800; background:linear-gradient(135deg,#6366f1,#a855f7); color:#fff;">
+          다음 단계 → Problem 정의
         </button>
-        <p style="text-align:center; color:#475569; font-size:.76rem; margin-top:10px;">공고별 배점표를 분석해 합격률을 최대화합니다</p>
       </div>
 
-      <!-- 스텝 1.5: 공고 선택 -->
+      <!-- Step 2: Problem -->
+      <div id="gen-step-s2" style="display:none; padding:28px 36px 36px;">
+        <button onclick="closeGenModal()" style="position:absolute; top:16px; right:20px; background:none; border:none; color:#64748b; font-size:1.5rem; cursor:pointer;">×</button>
+        <button onclick="showGenStep('input')" style="background:none; border:none; color:#6366f1; font-size:.82rem; font-weight:600; cursor:pointer; margin-bottom:16px; padding:0;">← 이전</button>
+        <div style="margin-bottom:20px;">
+          <div style="font-size:.75rem; font-weight:700; color:#f59e0b; letter-spacing:2px; margin-bottom:6px;">STEP 2 · Problem</div>
+          <h3 style="font-size:1.3rem; font-weight:900; margin-bottom:4px;">어떤 문제를 해결하나요?</h3>
+          <p style="color:#64748b; font-size:.82rem;">심사위원이 가장 먼저 보는 부분 — 정량으로 답하세요</p>
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="display:block; font-size:.78rem; font-weight:600; color:#94a3b8; margin-bottom:5px;">기존 시장/경쟁사의 핵심 문제점 <span style="color:#ef4444">*</span></label>
+          <textarea id="prob-problem" rows="3" placeholder="예: 기존 수작업 선별 방식은 오분류율 35%, 인건비 월 800만원 소요. 자동화 솔루션도 단일 소재만 처리 가능." style="width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:#fff; font-size:.875rem; outline:none; resize:vertical; box-sizing:border-box; font-family:inherit;"></textarea>
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="display:block; font-size:.78rem; font-weight:600; color:#94a3b8; margin-bottom:5px;">우리 솔루션으로 고객이 얻는 정량 효과</label>
+          <textarea id="prob-benefit" rows="2" placeholder="예: 선별 정확도 97% → 불량률 80% 감소, 인건비 월 600만원 절감, ROI 8개월." style="width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:#fff; font-size:.875rem; outline:none; resize:vertical; box-sizing:border-box; font-family:inherit;"></textarea>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:.78rem; font-weight:600; color:#94a3b8; margin-bottom:5px;">비즈니스 모델 (BM)</label>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;" id="bm-chips">
+            <label style="cursor:pointer;"><input type="radio" name="bm" value="B2B 구독(SaaS/RaaS)" style="display:none" onchange="selectBM(this)"><span class="bm-chip">B2B 구독(SaaS/RaaS)</span></label>
+            <label style="cursor:pointer;"><input type="radio" name="bm" value="B2B 직판" style="display:none" onchange="selectBM(this)"><span class="bm-chip">B2B 직판</span></label>
+            <label style="cursor:pointer;"><input type="radio" name="bm" value="B2G 조달" style="display:none" onchange="selectBM(this)"><span class="bm-chip">B2G 조달</span></label>
+            <label style="cursor:pointer;"><input type="radio" name="bm" value="B2C" style="display:none" onchange="selectBM(this)"><span class="bm-chip">B2C</span></label>
+            <label style="cursor:pointer;"><input type="radio" name="bm" value="플랫폼" style="display:none" onchange="selectBM(this)"><span class="bm-chip">플랫폼</span></label>
+          </div>
+        </div>
+        <button onclick="goToStep3()" style="width:100%; padding:14px; border-radius:12px; border:none; cursor:pointer; font-size:.95rem; font-weight:800; background:linear-gradient(135deg,#f59e0b,#f97316); color:#fff;">
+          다음 단계 → Scale-up 수치 입력
+        </button>
+      </div>
+
+      <!-- Step 3: Scale-up -->
+      <div id="gen-step-s3" style="display:none; padding:28px 36px 36px;">
+        <button onclick="closeGenModal()" style="position:absolute; top:16px; right:20px; background:none; border:none; color:#64748b; font-size:1.5rem; cursor:pointer;">×</button>
+        <button onclick="showGenStep('s2')" style="background:none; border:none; color:#6366f1; font-size:.82rem; font-weight:600; cursor:pointer; margin-bottom:16px; padding:0;">← 이전</button>
+        <div style="margin-bottom:20px;">
+          <div style="font-size:.75rem; font-weight:700; color:#22c55e; letter-spacing:2px; margin-bottom:6px;">STEP 3 · Scale-up 수치</div>
+          <h3 style="font-size:1.3rem; font-weight:900; margin-bottom:4px;">AI가 이 숫자로 계획서를 채웁니다</h3>
+          <p style="color:#ef4444; font-size:.78rem; font-weight:700;">⚠️ AI는 아래 수치를 절대 바꾸지 않습니다 — 직접 입력하세요</p>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+          <div>
+            <label style="display:block; font-size:.75rem; font-weight:600; color:#94a3b8; margin-bottom:4px;">타겟 고객 (구체적으로)</label>
+            <input id="scale-target" placeholder="예: 국내 재활용 선별장 300개소" style="width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:8px; padding:9px 11px; color:#fff; font-size:.875rem; outline:none; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:.75rem; font-weight:600; color:#94a3b8; margin-bottom:4px;">예상 단가 (서비스/제품)</label>
+            <input id="scale-price" placeholder="예: 월 200만원 구독" style="width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:8px; padding:9px 11px; color:#fff; font-size:.875rem; outline:none; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:.75rem; font-weight:600; color:#94a3b8; margin-bottom:4px;">보유 특허 / 상표권 수</label>
+            <select id="fact-patent" style="width:100%; background:#1a1a2e; border:1px solid rgba(255,255,255,.1); border-radius:8px; padding:9px 11px; color:#fff; font-size:.875rem; outline:none; box-sizing:border-box;">
+              <option value="0">없음 (0개)</option><option value="1">1~2개 (출원 포함)</option>
+              <option value="3">3~5개</option><option value="6">6개 이상</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:.75rem; font-weight:600; color:#94a3b8; margin-bottom:4px;">현재 TRL 단계</label>
+            <select id="scale-trl" style="width:100%; background:#1a1a2e; border:1px solid rgba(255,255,255,.1); border-radius:8px; padding:9px 11px; color:#fff; font-size:.875rem; outline:none; box-sizing:border-box;">
+              <option value="TRL 1~3 (기초연구)">TRL 1~3 (기초연구)</option>
+              <option value="TRL 4~5 (시작품 개발)" selected>TRL 4~5 (시작품 개발)</option>
+              <option value="TRL 6~7 (시작품 검증)">TRL 6~7 (시작품 검증)</option>
+              <option value="TRL 8~9 (사업화 완료)">TRL 8~9 (사업화 완료)</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:.75rem; font-weight:600; color:#94a3b8; margin-bottom:4px;">핵심 성능 개선 목표 (%)</label>
+            <input id="fact-perf" type="number" min="0" placeholder="예: 40" style="width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:8px; padding:9px 11px; color:#fff; font-size:.875rem; outline:none; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:.75rem; font-weight:600; color:#94a3b8; margin-bottom:4px;">현재 월 매출 (만원)</label>
+            <input id="fact-monthly-revenue" type="number" min="0" placeholder="없으면 0" style="width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:8px; padding:9px 11px; color:#fff; font-size:.875rem; outline:none; box-sizing:border-box;">
+          </div>
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-size:.75rem; font-weight:600; color:#94a3b8; margin-bottom:4px;">기존 고객사 / MOU / 수요처 확약</label>
+          <input id="fact-customers" placeholder="예: (주)삼성전자 PoC 진행 중, 스타트업 3사 MOU 체결" style="width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:8px; padding:9px 11px; color:#fff; font-size:.875rem; outline:none; box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:.75rem; font-weight:600; color:#94a3b8; margin-bottom:4px;">신청 지원금 규모 (만원)</label>
+          <input id="fact-grant-amount" type="number" min="0" placeholder="예: 10000 (1억)" style="width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:8px; padding:9px 11px; color:#fff; font-size:.875rem; outline:none; box-sizing:border-box;">
+        </div>
+        <button onclick="findMatchingGrants()" style="width:100%; padding:14px; border-radius:12px; border:none; cursor:pointer; font-size:.95rem; font-weight:800; background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff;">
+          🔍 맞춤 공고 찾기 →
+        </button>
+      </div>
+
+      <!-- 스텝 4: 공고 선택 -->
       <div id="gen-step-grants" style="display:none; padding:40px 36px;">
         <button onclick="closeGenModal()" style="position:absolute; top:16px; right:20px; background:none; border:none; color:#64748b; font-size:1.5rem; cursor:pointer;">×</button>
-        <button onclick="showGenStep('input')" style="background:none; border:none; color:#6366f1; font-size:.85rem; font-weight:600; cursor:pointer; margin-bottom:20px; padding:0;">← 다시 입력</button>
-        <div style="font-size:.8rem; font-weight:700; color:#6366f1; letter-spacing:2px; margin-bottom:8px;">STEP 2 / 3</div>
+        <button onclick="showGenStep('s3')" style="background:none; border:none; color:#6366f1; font-size:.85rem; font-weight:600; cursor:pointer; margin-bottom:20px; padding:0;">← 다시 입력</button>
+        <div style="font-size:.8rem; font-weight:700; color:#6366f1; letter-spacing:2px; margin-bottom:8px;">STEP 4 · 공고 매칭</div>
         <h3 style="font-size:1.3rem; font-weight:900; margin-bottom:6px;">신청할 공고를 선택하세요</h3>
         <p style="color:#64748b; font-size:.875rem; margin-bottom:16px;">선택한 공고의 배점표를 AI가 분석해 합격 최적화 계획서를 작성합니다</p>
 
@@ -796,6 +862,12 @@
             <div style="background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.3); border-radius:99px; padding:6px 14px; font-size:.82rem; font-weight:700; color:#a78bfa;" id="result-prob-badge">합격률 72%</div>
           </div>
         </div>
+        
+        <!-- 점수 사유 (Rationale) 표출 영역 -->
+        <div id="result-rationale-box" style="display:none; margin-bottom: 24px; padding: 16px 20px; background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; border-radius: 8px; font-size: .85rem; color: #cbd5e1; line-height: 1.5;">
+          <strong style="color: #60a5fa; display: block; margin-bottom: 6px;">💡 AI 심사관 코멘트</strong>
+          <span id="result-rationale-text"></span>
+        </div>
 
         <!-- PDF 페이지 미리보기 -->
         <div style="margin-bottom:16px;">
@@ -807,25 +879,35 @@
           <!-- 1~3페이지: 실제 내용 -->
           <div id="result-pages-visible" style="display:flex; flex-direction:column; gap:10px; margin-bottom:10px;"></div>
 
-          <!-- 4~15페이지: 모자이크 -->
-          <div style="display:flex; flex-direction:column; gap:10px; position:relative;">
+          <!-- 4~15페이지: 모자이크 (dev 모드에서는 블러 없음) -->
+          <div id="blurred-section-wrap" style="display:flex; flex-direction:column; gap:10px; position:relative;">
             <div id="result-pages-blurred" style="display:flex; flex-direction:column; gap:10px; filter:blur(5px); user-select:none; pointer-events:none;"></div>
-            <!-- 잠금 오버레이 -->
+            <!-- 잠금 오버레이 (일반 유저용) -->
             <div id="lock-overlay" style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(to bottom, rgba(12,12,26,.3) 0%, rgba(12,12,26,.97) 40%); border-radius:12px; padding:24px; text-align:center; z-index:2;">
               <div style="font-size:2rem; margin-bottom:8px;">🔒</div>
-              <div style="font-weight:800; font-size:1rem; margin-bottom:6px;">4~15페이지 + PDF 다운로드</div>
-              <div style="color:#94a3b8; font-size:.82rem; margin-bottom:18px;">강점 분석 · 배점 최적화 전략 · 고용창출·해외진출 섹션 · 성능지표 표</div>
-              <button id="btn-download-pdf" onclick="downloadPdf()" style="display:none; padding:14px 32px; border-radius:12px; border:none; cursor:pointer; font-size:.95rem; font-weight:800; background:linear-gradient(135deg,#059669,#10b981); color:#fff; margin-bottom:10px; width:100%;">
-                📥 전체 PDF 다운로드
-              </button>
+              <div style="font-weight:800; font-size:1rem; margin-bottom:6px;">4~15페이지 + HWPX 원본 + 대면 발표 PT 스크립트</div>
+              <div style="color:#94a3b8; font-size:.82rem; margin-bottom:18px;">잠금 해제 시, 약점을 모두 방어한 합격 최적화 계획서를 제공합니다.</div>
               <button onclick="closeGenModal(); openApplyModal();" style="padding:14px 32px; border-radius:12px; border:none; cursor:pointer; font-size:.95rem; font-weight:800; background:linear-gradient(135deg,#6366f1,#a855f7); color:#fff;">
-                전체 PDF 받기 → 무료 신청
+                전체 HWPX 및 PT 무기 받기 → 결제하기
               </button>
             </div>
           </div>
+          <!-- PDF 다운로드 버튼 (dev: 항상 노출, 일반: 결제 후) -->
+          <button id="btn-download-pdf" onclick="downloadPdf()" style="display:none; width:100%; margin-top:12px; padding:14px; border-radius:12px; border:none; cursor:pointer; font-size:.95rem; font-weight:800; background:linear-gradient(135deg,#059669,#10b981); color:#fff;">
+            📥 전체 PDF 다운로드
+          </button>
         </div>
 
         <button onclick="closeGenModal()" style="width:100%; padding:12px; border-radius:10px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); color:#64748b; font-size:.875rem; cursor:pointer;">닫기</button>
+        
+        <!-- 개발자 전용 도구 패널 -->
+        <div id="dev-tools-panel" style="display:none; margin-top:20px; background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.3); border-radius:12px; padding:16px;">
+          <div style="font-weight:800; color:#f59e0b; margin-bottom:12px; font-size:.9rem;">🛠 개발자 전용 다운로드 패널</div>
+          <div style="display:flex; gap:10px;">
+            <button id="dev-btn-pdf" onclick="downloadPdf()" style="flex:1; padding:12px; border-radius:8px; border:none; cursor:pointer; font-weight:700; background:linear-gradient(135deg,#059669,#10b981); color:#fff; font-size:.85rem;">PDF 생성본 다운로드</button>
+            <button id="dev-btn-hwpx" onclick="downloadHwpx()" style="flex:1; padding:12px; border-radius:8px; border:none; cursor:pointer; font-weight:700; background:linear-gradient(135deg,#2563eb,#3b82f6); color:#fff; font-size:.85rem;">HWPX 원본 다운로드</button>
+          </div>
+        </div>
       </div>
 
       <!-- 스텝 4: 에러 -->
@@ -946,9 +1028,48 @@
       document.body.style.overflow = '';
     }
     function showGenStep(step) {
-      ['input','grants','loading','result','error'].forEach(s => {
-        document.getElementById('gen-step-'+s).style.display = s === step ? 'block' : 'none';
+      ['input','s2','s3','grants','loading','result','error'].forEach(s => {
+        const el = document.getElementById('gen-step-'+s);
+        if (el) el.style.display = s === step ? 'block' : 'none';
       });
+      // 프로그레스바 표시 여부
+      const pb = document.getElementById('gen-progress-bar');
+      if (['input','s2','s3','grants'].includes(step)) {
+        pb.style.display = 'block';
+        updateProgress(step);
+      } else {
+        pb.style.display = 'none';
+      }
+    }
+
+    function updateProgress(step) {
+      const stepMap = { 'input': 1, 's2': 2, 's3': 3, 'grants': 4 };
+      const current = stepMap[step] || 1;
+      document.querySelectorAll('.gp-step').forEach((el, idx) => {
+        const sNum = idx + 1;
+        el.classList.remove('active', 'done');
+        if (sNum === current) el.classList.add('active');
+        if (sNum < current) el.classList.add('done');
+      });
+    }
+
+    function goToStep2() {
+      if (!document.getElementById('gen-company').value || !document.getElementById('gen-industry').value || !document.getElementById('gen-tech').value) {
+        alert('필수 항목(*)을 입력해주세요.'); return;
+      }
+      showGenStep('s2');
+    }
+
+    function goToStep3() {
+      if (!document.getElementById('prob-problem').value) {
+        alert('문점점을 입력해주세요.'); return;
+      }
+      showGenStep('s3');
+    }
+
+    let _selectedBM = '';
+    function selectBM(radio) {
+      _selectedBM = radio.value;
     }
     function handleFileSelect(input) {
       if (input.files[0]) {
@@ -1090,15 +1211,22 @@
         company_name: document.getElementById('gen-company').value || '테스트기업',
         industry: document.getElementById('gen-industry').value || 'IT/소프트웨어',
         core_tech: tech,
-        team_size: document.getElementById('gen-employees').value || '5~9명',
-        revenue: document.getElementById('gen-revenue').value || '1억 미만',
-        keywords: tech.split(/[\s,]+/).slice(0,5),
-        // Fact-Grounding 정량 데이터
+        team_size: document.getElementById('gen-employees').value || '미선택',
+        founded_year: document.getElementById('gen-founded').value || '미선택',
+        // Step 2
+        problem: document.getElementById('prob-problem').value || '',
+        benefit: document.getElementById('prob-benefit').value || '',
+        business_model: _selectedBM || 'B2B',
+        // Step 3
+        target_customer: document.getElementById('scale-target').value || '',
+        unit_price: document.getElementById('scale-price').value || '',
         fact_patent: document.getElementById('fact-patent').value || '0',
-        fact_monthly_revenue: document.getElementById('fact-monthly-revenue').value || '0',
+        trl_level: document.getElementById('scale-trl').value || 'TRL 4',
         fact_perf_improvement: document.getElementById('fact-perf').value || '',
-        fact_grant_amount: document.getElementById('fact-grant-amount').value || '',
+        fact_monthly_revenue: document.getElementById('fact-monthly-revenue').value || '0',
         fact_customers: document.getElementById('fact-customers').value || '',
+        fact_grant_amount: document.getElementById('fact-grant-amount').value || '',
+        keywords: tech.split(/[\s,]+/).slice(0, 5),
       };
 
       // 파일 업로드 있으면 먼저 분석
@@ -1244,6 +1372,8 @@
     }
 
     // ── 결과 렌더링 (마크다운 → HTML + CSS 오버레이) ──
+    let _ptScriptResult = null; // PT 및 Q&A 결과 저장용 캐시
+
     function renderResult(result) {
       const text = result.proposal_text || '';
 
@@ -1308,7 +1438,12 @@
       const blurContainer = document.getElementById('result-pages-blurred');
       blurContainer.innerHTML = '';
       const dummyMd = '## ████ ███████ ████\n\n| ████ | ████████ | ████ |\n|------|---------|------|\n| ████ | ██████ | ██ |\n| ███████ | ████ | ██████ |\n\n- ██████ ████████ ████████████\n- ████ ██████████ ███\n\n';
-      for (let p = 0; p < Math.max(blurredSections.length, 5); p++) {
+      
+      let blurLoopCount = Math.max(blurredSections.length, 5);
+      if (isDevUser()) {
+        blurLoopCount = blurredSections.length; // 개발자 모드면 실제 생성된 양만큼만 렌더링
+      }
+      for (let p = 0; p < blurLoopCount; p++) {
         const sec = blurredSections[p] || dummyMd.repeat(3);
         const html = renderMarkdown(sec);
         blurContainer.innerHTML += `
@@ -1325,28 +1460,33 @@
       document.getElementById('result-score-badge').textContent = grade + ' · ' + score + '점';
       document.getElementById('result-prob-badge').textContent  = '합격률 ' + prob + '%';
 
+      if (result.score_rationale) {
+        document.getElementById('result-rationale-box').style.display = 'block';
+        document.getElementById('result-rationale-text').textContent = result.score_rationale;
+      } else {
+        document.getElementById('result-rationale-box').style.display = 'none';
+      }
+
       if (result.pdf_b64) {
         _pdfB64 = result.pdf_b64;
         _pdfFilename = (_companyInfoCache?.company_name || '사업계획서') + '_GrantAI.pdf';
         document.getElementById('btn-download-pdf').style.display = 'block';
       }
 
-      // ── dev 모드: 블러 제거 + 전체 섹션 표시 ──
+      // ── dev 모드: 블러 완전 제거 ──
       if (isDevUser()) {
-        // 블러 컨테이너 blur 해제
         const blurWrap = document.getElementById('result-pages-blurred');
-        blurWrap.style.filter = 'none';
-        blurWrap.style.userSelect = 'auto';
-        blurWrap.style.pointerEvents = 'auto';
-        // 잠금 오버레이 숨김
-        const overlay = document.getElementById('lock-overlay');
-        if (overlay) overlay.style.display = 'none';
-        // dev 배지 표시
+        blurWrap.setAttribute('style',
+          'display:flex; flex-direction:column; gap:10px;');  // filter:blur 완전 제거
+        document.getElementById('lock-overlay').style.display = 'none';
+        document.getElementById('btn-download-pdf').style.display = 'block'; // PDF 버튼 강제 노출
+        const devPanel = document.getElementById('dev-tools-panel');
+        if (devPanel) devPanel.style.display = 'block';
         const scoreBadge = document.getElementById('result-score-badge');
-        scoreBadge.textContent = '🛠 DEV · ' + scoreBadge.textContent;
-        scoreBadge.style.background = 'rgba(245,158,11,.12)';
-        scoreBadge.style.borderColor = 'rgba(245,158,11,.3)';
-        scoreBadge.style.color = '#f59e0b';
+        if (!scoreBadge.textContent.includes('DEV')) {
+          scoreBadge.textContent = '🛠 DEV · ' + scoreBadge.textContent;
+          scoreBadge.style.cssText += ';background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.3);color:#f59e0b';
+        }
       }
 
       showGenStep('result');
@@ -1423,6 +1563,20 @@
             else if (event.type === 'done') {
               setStep('final', true);
               renderResult(event);
+              
+              // [추가] 유저가 미리보기를 보는 동안 백그라운드에서 PT 스크립트 비동기 생성 시작
+              fetch(API_BASE + '/generate-pt-script', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  company_info: companyInfo,
+                  proposal_text: event.proposal_text
+                })
+              }).then(r => r.json()).then(data => {
+                _ptScriptResult = data;
+                console.log('Background PT Script Generated');
+              }).catch(e => console.error('PT Script Generation Failed', e));
+
               return;
             }
             else if (event.type === 'error') {

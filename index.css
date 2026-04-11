@@ -157,3 +157,17 @@ body {
 .final-cta-card h2 { font-size:2rem; font-weight:900; margin-bottom:12px; }
 .cta-group { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
 @media(max-width:600px) { .final-cta-card { padding:40px 24px; } .final-cta-card h2 { font-size:1.6rem; } }
+
+/* ── Wizard UI ── */
+.bm-chip {
+  padding: 8px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.05); color: #94a3b8; font-size: .82rem; font-weight: 600;
+  transition: all .2s;
+}
+input[type="radio"]:checked + .bm-chip {
+  background: rgba(99,102,241,.15); border-color: #6366f1; color: #fff;
+  box-shadow: 0 0 12px rgba(99,102,241,0.2);
+}
+.gp-step { transition: all 0.3s ease; }
+.gp-step.active { color: #6366f1 !important; border-color: #6366f1 !important; }
+.gp-step.done { color: #22c55e !important; border-color: #22c55e !important; }
