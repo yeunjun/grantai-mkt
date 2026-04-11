@@ -2,10 +2,11 @@
    GrantAI — Landing Page JavaScript
    ========================================== */
 
-// ── 설정: 실제 배포 시 이 값들을 교체하세요 ──
+// ── 설정 ──
 const CONFIG = {
   tossLink:   'https://pay.toss.im/PLACEHOLDER',
   kakaoLink:  'https://open.kakao.com/o/PLACEHOLDER',
+  appLink:    'https://yeunjun.github.io/grantai-mkt/app/',
   totalFreeSlots: 100,
   usedFreeSlots:  14,
 };
@@ -161,18 +162,10 @@ document.addEventListener('keydown', e => {
 // 6. CTA 핸들러
 // ==========================================
 function handlePaidCTA(e) {
-  e.preventDefault();
-
-  // 토스 링크가 설정되지 않은 경우 카카오 링크로 대체
-  if (CONFIG.tossLink.includes('PLACEHOLDER')) {
-    if (CONFIG.kakaoLink.includes('PLACEHOLDER')) {
-      // 둘 다 미설정 시 애니메이션 알림
-      showToast('💬 카카오톡으로 문의해주세요! (링크 준비 중)', 'info');
-    } else {
-      window.open(CONFIG.kakaoLink, '_blank');
-    }
-  } else {
-    window.open(CONFIG.tossLink, '_blank');
+  // 인라인 스크립트의 openApplyModal()이 window에 있으면 그것을 사용
+  if (e) e.preventDefault();
+  if (typeof window.openApplyModal === 'function') {
+    window.openApplyModal();
   }
 }
 
@@ -304,6 +297,15 @@ function initSmoothScroll() {
     });
   });
 }
+
+// ==========================================
+// 전역 노출 — onclick 속성에서 호출 가능하도록
+// ==========================================
+window.toggleFAQ = toggleFAQ;
+window.handlePaidCTA = handlePaidCTA;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.handleLeadSubmit = handleLeadSubmit;
 
 // ==========================================
 // INIT — DOM 준비 후 모든 모듈 실행
