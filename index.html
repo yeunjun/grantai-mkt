@@ -8,7 +8,7 @@
   <meta property="og:title" content="GrantAI — 정부지원금 자동 매칭 + AI 사업계획서">
   <meta property="og:description" content="우리 회사가 받을 수 있는 지원금이 얼마인지 3초 만에 확인하세요.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
-  
+  <link rel="stylesheet" href="index.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
@@ -120,8 +120,6 @@
       .calc-amount { font-size:2.2rem; }
     }
   </style>
-  <script type="module" crossorigin src="/grantai-mkt/assets/index-23933c36.js"></script>
-  <link rel="stylesheet" href="/grantai-mkt/assets/index-907753fc.css">
 </head>
 <body>
 
@@ -339,36 +337,79 @@
   <section style="padding:80px 0;" id="sample">
     <div class="container">
       <div class="section-label reveal" style="text-align:center">실제 생성 결과</div>
-      <h2 class="section-title reveal" style="text-align:center">이런 계획서가 나옵니다</h2>
-      <div style="max-width:860px; margin:40px auto 0; background:var(--bg-card); border:1px solid var(--border); border-radius:24px; overflow:hidden;">
-        <div style="background:rgba(99,102,241,.08); border-bottom:1px solid var(--border); padding:18px 28px; display:flex; align-items:center; gap:12px;">
-          <span style="width:12px;height:12px;border-radius:50%;background:#ef4444;display:inline-block;"></span>
-          <span style="width:12px;height:12px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>
-          <span style="width:12px;height:12px;border-radius:50%;background:#22c55e;display:inline-block;"></span>
-          <span style="margin-left:8px;font-size:.82rem;color:var(--text-muted);">GrantAI — 2026 AI·데이터 스타트업 성장 지원사업 계획서 (B+, 76점)</span>
-          <span style="margin-left:auto;font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(34,197,94,.15);color:#4ade80;">합격 가능성 72%</span>
-        </div>
-        <div style="padding:32px 36px; font-size:.9rem; line-height:1.9; color:#e2e8f0; font-family:monospace;">
-          <div style="color:#a78bfa; font-weight:700; margin-bottom:16px;">□ 1. 사업 개요 및 문제 인식</div>
-          <div style="color:#94a3b8; margin-bottom:12px;">○ 시장 규모 (TAM·SAM·SOM)</div>
-          <div style="margin-bottom:8px; padding-left:16px;">- 국내 AI 반도체 설계 시장 <strong style="color:#a78bfa;">₩4.2조</strong> (2026년, IITP 기준)</div>
-          <div style="margin-bottom:8px; padding-left:16px;">- 국내 팹리스 수요 기업 <strong style="color:#a78bfa;">340개사</strong> → SAM ₩8,500억</div>
-          <div style="margin-bottom:20px; padding-left:16px;">- 초기 목표 고객 <strong style="color:#a78bfa;">28개사</strong> → SOM ₩70억</div>
-          <div style="color:#94a3b8; margin-bottom:12px;">○ 핵심 문제점</div>
-          <div style="padding-left:16px; margin-bottom:20px; color:#cbd5e1;">
-            - 기존 EDA 툴(Cadence, Synopsys) 의존도 97%, 라이선스 비용 연간 <strong style="color:#f87171;">5~15억원</strong><br>
-            - 중소 팹리스 국내 AI 최적화 솔루션 부재 → 해외 의존 지속
+      <h2 class="section-title reveal" style="text-align:center">이 정도 입력하면<br>이런 PDF가 나옵니다</h2>
+      <p style="text-align:center; color:var(--text-muted); margin-bottom:40px; font-size:.95rem;">에코비전(EcoVision) — 폐플라스틱 AI 선별 로봇 실제 생성 예시</p>
+
+      <div style="max-width:940px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start;">
+
+        <!-- 입력 카드 -->
+        <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:20px; padding:28px;">
+          <div style="font-size:.75rem; font-weight:700; color:#6366f1; letter-spacing:2px; margin-bottom:14px;">INPUT — 입력 정보</div>
+          <div style="display:flex; flex-direction:column; gap:10px; font-size:.85rem;">
+            <div><span style="color:#64748b; font-size:.75rem; display:block; margin-bottom:2px;">기업명</span><span style="font-weight:700;">에코비전 (EcoVision)</span></div>
+            <div><span style="color:#64748b; font-size:.75rem; display:block; margin-bottom:2px;">아이템</span><span style="font-weight:600; line-height:1.5;">딥러닝 AI 비전 폐플라스틱<br>고속 자동 선별 로봇 시스템</span></div>
+            <div><span style="color:#64748b; font-size:.75rem; display:block; margin-bottom:2px;">핵심 기술</span>
+              <ul style="margin:4px 0 0 14px; padding:0; color:#cbd5e1; line-height:1.7; font-size:.82rem;">
+                <li>자체 수집 50만장 데이터셋</li>
+                <li>오염·압착 98% 인식 정확도</li>
+                <li>엣지컴퓨팅 초당 3개 처리</li>
+              </ul>
+            </div>
+            <div><span style="color:#64748b; font-size:.75rem; display:block; margin-bottom:2px;">비즈니스 모델</span><span>RaaS 월 200만원 구독형<br>B2G 지자체 납품 후 동남아 진출</span></div>
+            <div><span style="color:#64748b; font-size:.75rem; display:block; margin-bottom:2px;">팀</span><span>기계공학 박사 대표 + AI 비전 CTO<br>+ B2G 세일즈 이사</span></div>
           </div>
-          <div style="color:#a78bfa; font-weight:700; margin-bottom:16px;">□ 2. 기술성 및 혁신성 (배점 30점)</div>
-          <div style="padding-left:16px; color:#cbd5e1;">
-            - TRL <strong style="color:#22c55e;">7단계</strong> (시작품 성능 검증 완료, 특허 3건 등록)<br>
-            - 경쟁사 대비 처리속도 <strong style="color:#a78bfa;">3.2배</strong>↑, 전력효율 <strong style="color:#a78bfa;">41%</strong>↑<br>
-            - 핵심 특허 보유: AI 기반 RTL 자동 최적화 알고리즘 (10-2024-XXXXXX)
-          </div>
-          <div style="margin-top:20px; padding:16px; background:rgba(99,102,241,.06); border-radius:12px; border:1px dashed rgba(99,102,241,.2); text-align:center; color:var(--text-muted); font-family:inherit;">
-            🔒 3~15페이지 전체 내용은 <strong style="color:#a78bfa;">프로 플랜</strong>에서 확인하세요
+          <div style="margin-top:20px; padding:12px; background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.2); border-radius:10px; font-size:.78rem; color:#4ade80; text-align:center;">
+            ⏱ 입력 후 약 45초 → 계획서 생성 완료
           </div>
         </div>
+
+        <!-- 출력 미리보기 카드 -->
+        <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:20px; overflow:hidden;">
+          <div style="background:rgba(99,102,241,.1); border-bottom:1px solid var(--border); padding:14px 20px; display:flex; align-items:center; gap:8px;">
+            <span style="width:10px;height:10px;border-radius:50%;background:#ef4444;display:inline-block;"></span>
+            <span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>
+            <span style="width:10px;height:10px;border-radius:50%;background:#22c55e;display:inline-block;"></span>
+            <span style="margin-left:6px;font-size:.78rem;color:var(--text-muted);">EcoVision_사업계획서.pdf</span>
+            <span style="margin-left:auto;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(34,197,94,.15);color:#4ade80;">B+ · 76점</span>
+          </div>
+          <!-- PDF 페이지 흉내 -->
+          <div style="background:#fff; padding:24px 22px; color:#1a1a1a; font-size:.78rem; line-height:1.8; max-height:480px; overflow:hidden; position:relative;">
+            <div style="color:#003366; font-weight:900; font-size:.95rem; text-align:center; margin-bottom:12px; border-bottom:2px solid #003366; padding-bottom:8px;">사 업 계 획 서</div>
+            <div style="display:grid; grid-template-columns:auto 1fr; gap:4px 10px; font-size:.74rem; margin-bottom:14px; background:#f0f4ff; padding:10px; border-radius:6px;">
+              <span style="color:#003366; font-weight:700;">기업명</span><span>에코비전(EcoVision)</span>
+              <span style="color:#003366; font-weight:700;">모델명</span><span>EcoBot-S1</span>
+              <span style="color:#003366; font-weight:700;">사업모델</span><span>RaaS 월 200만원</span>
+            </div>
+            <div style="color:#003366; font-weight:800; margin-bottom:6px; font-size:.82rem;">□ 1. 기술개발의 개요 및 필요성</div>
+            <div style="color:#1e3a5f; font-weight:700; margin-bottom:4px; font-size:.78rem;">○ 개발 대상 기술 개요</div>
+            <div style="margin-bottom:10px; color:#334155; font-size:.74rem; line-height:1.7;">딥러닝 AI 비전 및 엣지컴퓨팅 기술을 융합하여, 재활용 선별장의 수작업 의존성을 혁신적으로 대체하는 <strong style="color:#003366;">'폐플라스틱 고속 자동 선별 로봇 시스템(EcoBot-S1)'</strong>을 개발한다.</div>
+            <div style="color:#1e3a5f; font-weight:700; margin-bottom:4px; font-size:.78rem;">○ 시장 규모 (TAM · SAM · SOM)</div>
+            <table style="width:100%; border-collapse:collapse; font-size:.72rem; margin-bottom:10px;">
+              <tr style="background:#e8f0fe;"><th style="padding:4px 6px; border:1px solid #c7d2fe; color:#003366; text-align:left;">구분</th><th style="padding:4px 6px; border:1px solid #c7d2fe; color:#003366;">규모</th><th style="padding:4px 6px; border:1px solid #c7d2fe; color:#003366;">근거</th></tr>
+              <tr><td style="padding:4px 6px; border:1px solid #e2e8f0;">TAM</td><td style="padding:4px 6px; border:1px solid #e2e8f0; text-align:center; font-weight:700; color:#003366;">₩2.8조</td><td style="padding:4px 6px; border:1px solid #e2e8f0; color:#64748b;">국내 폐기물 처리시장 전체</td></tr>
+              <tr style="background:#f8fafc;"><td style="padding:4px 6px; border:1px solid #e2e8f0;">SAM</td><td style="padding:4px 6px; border:1px solid #e2e8f0; text-align:center; font-weight:700; color:#003366;">₩4,200억</td><td style="padding:4px 6px; border:1px solid #e2e8f0; color:#64748b;">민간+공공 선별장 380개소</td></tr>
+              <tr><td style="padding:4px 6px; border:1px solid #e2e8f0;">SOM</td><td style="padding:4px 6px; border:1px solid #e2e8f0; text-align:center; font-weight:700; color:#003366;">₩96억</td><td style="padding:4px 6px; border:1px solid #e2e8f0; color:#64748b;">3년내 40개소 × 월200만×12</td></tr>
+            </table>
+            <!-- 블러 오버레이 -->
+            <div style="position:absolute; bottom:0; left:0; right:0; height:180px; background:linear-gradient(to bottom, transparent 0%, rgba(255,255,255,.97) 55%); display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding-bottom:20px;">
+              <div style="font-size:.75rem; color:#64748b; margin-bottom:8px;">📄 2~15페이지 더 있음</div>
+              <button onclick="openGenerateModal()" style="padding:10px 22px; border-radius:10px; border:none; cursor:pointer; font-size:.82rem; font-weight:700; background:linear-gradient(135deg,#6366f1,#a855f7); color:#fff;">
+                내 회사 계획서 생성하기 →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 생성 포함 항목 배지 -->
+      <div style="max-width:940px; margin:20px auto 0; display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">
+        <span style="background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.25); padding:5px 12px; border-radius:99px; font-size:.78rem; color:#a78bfa;">✓ TAM·SAM·SOM 시장분석표</span>
+        <span style="background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.25); padding:5px 12px; border-radius:99px; font-size:.78rem; color:#a78bfa;">✓ 성능지표 달성도 표</span>
+        <span style="background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.25); padding:5px 12px; border-radius:99px; font-size:.78rem; color:#a78bfa;">✓ 경쟁사 비교 매트릭스</span>
+        <span style="background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.25); padding:5px 12px; border-radius:99px; font-size:.78rem; color:#a78bfa;">✓ 3개년 매출 로드맵</span>
+        <span style="background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.25); padding:5px 12px; border-radius:99px; font-size:.78rem; color:#a78bfa;">✓ 고용창출 계획</span>
+        <span style="background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.25); padding:5px 12px; border-radius:99px; font-size:.78rem; color:#a78bfa;">✓ 해외진출 계획</span>
+        <span style="background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.25); padding:5px 12px; border-radius:99px; font-size:.78rem; color:#a78bfa;">✓ 지원금 사용 계획표</span>
+        <span style="background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.2); padding:5px 12px; border-radius:99px; font-size:.78rem; color:#4ade80;">✓ PDF 다운로드 (프로)</span>
       </div>
     </div>
   </section>
@@ -686,7 +727,7 @@
     .gen-step-row { font-size:.85rem; color:#a78bfa; font-weight:600; padding:6px 0; }
   </style>
 
-  
+  <script type="module" src="index.js"></script>
   <script>
     // ── 지원금 계산기 ──
     const grantMap = {
